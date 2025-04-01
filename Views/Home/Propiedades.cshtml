@@ -1,0 +1,304 @@
+@model IEnumerable<Inmobiliaria_Rios.Models.Propiedad>
+
+@{
+    ViewData["Title"] = "Inmuebles";
+}
+
+<div class="text-center my-4">
+    <h1 class="display-4 text-primary">Inmuebles</h1>
+    <p class="lead text-secondary">Explora nuestra lista de propiedades disponibles.</p>
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-success show position-fixed custom-alert" role="alert" id="alertaMensaje">
+            @TempData["Mensaje"]
+        </div>
+    }
+</div>
+
+<div class="row mb-2 align-items-center">
+    <div class="col-md-3 col-sm-6">
+        <div class="search-container">
+            <span class="search-icon"><i class="bi bi-search"></i></span>
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar...">
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 ms-auto">
+        <a href="@Url.Action("NuevoInmueble", "Home")" class="btn btn-success btn-sm w-100 d-flex align-items-center justify-content-center">
+            <i class="bi bi-plus-circle me-2"></i>
+            <span>Nuevo Inmueble</span>
+        </a>
+    </div>
+</div>
+
+<div class="table-responsive modern-table-container">
+    <table class="table table-hover modern-table">
+        <thead>
+            <tr>
+                <th>Localidad</th>
+                <th>Provincia</th>
+                <th>Dirección</th>            
+                <th>Tipo</th>
+                <th>Ambientes</th>
+                <th>Baños</th>
+                <th>Garage</th>
+                <th>Capacidad Garage</th>
+                <th>Patio</th>
+                <th>Piscina</th>
+                <th>Terraza</th>
+                <th>Plantas</th>
+                <th>Cocina</th>
+                <th>Parrilla</th>
+                <th>Opción</th>
+                <th>Precio</th>
+                <th>Observaciones</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            @foreach (var propiedad in Model)
+            {
+                <tr class="align-middle property-row" style="cursor: pointer;" onclick="window.location.href='@Url.Action("EditarInmueble", "Home", new { id = propiedad.Id })'">
+                    <td>@propiedad.Localidad</td>
+                    <td>@propiedad.Provincia</td>
+                    <td>@propiedad.Direccion</td>
+                    <td>@propiedad.Tipo</td>
+                    <td>@propiedad.Ambientes</td>
+                    <td>@propiedad.Banos</td>
+                    <td class="text-center">@propiedad.Garage</td>
+                    <td class="text-center">@propiedad.CapGarage</td>
+                    <td class="text-center">@propiedad.Patio</td>
+                    <td class="text-center">@propiedad.Piscina</td>
+                    <td class="text-center">@propiedad.Terraza</td>
+                    <td class="text-center">@propiedad.Plantas</td>
+                    <td class="text-center">@propiedad.Cocina</td>
+                    <td class="text-center">@propiedad.Parrilla</td>
+                    <td class="text-center">@propiedad.Opcion</td>
+                    <td class="text-end">@string.Format("{0:C0}", propiedad.Precio)</td>
+                    <td>
+                        <span data-bs-toggle="tooltip" title="@propiedad.Observaciones">
+                            @propiedad.Observaciones
+                        </span>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .search-container {
+        position: relative;
+        background: linear-gradient(145deg, #ffffff, #f0f0f0);
+        border-radius: 8px;
+        padding: 2px;
+        box-shadow: 2px 2px 8px rgba(0,0,0,0.1),
+                   -2px -2px 8px rgba(255,255,255,0.8);
+        margin-bottom: 10px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 6px 30px;
+        border: none;
+        background: transparent;
+        font-size: 0.85rem;
+        color: #333;
+        outline: none;
+        height: 32px;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        font-size: 0.85rem;
+    }
+
+    @@media screen and (max-width: 768px) {
+        .search-container {
+            margin-bottom: 8px;
+        }
+        
+        .search-input {
+            padding: 4px 25px;
+            font-size: 0.8rem;
+            height: 28px;
+        }
+        
+        .search-icon {
+            left: 6px;
+            font-size: 0.8rem;
+        }
+    }
+
+    .modern-table-container {
+        background: linear-gradient(145deg, #ffffff, #f5f5f5);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 10px 10px 20px rgba(0,0,0,0.05),
+                    -10px -10px 20px rgba(255,255,255,0.8);
+    }
+
+    .modern-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        border: none;
+        font-size: 0.85rem;
+    }
+
+    .modern-table thead th {
+        background: linear-gradient(145deg, #28a745, #20c997);
+        color: white;
+        font-weight: 500;
+        padding: 8px;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        border: none;
+        white-space: nowrap;
+    }
+
+    .modern-table thead th:first-child {
+        border-top-left-radius: 15px;
+    }
+
+    .modern-table thead th:last-child {
+        border-top-right-radius: 15px;
+    }
+
+    .modern-table tbody tr {
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        transition: all 0.3s ease;
+    }
+
+    .modern-table tbody tr:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .modern-table td {
+        padding: 6px 8px;
+        border: none;
+        border-bottom: 1px solid #e9ecef;
+        white-space: nowrap;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .property-row td:first-child {
+        border-left: 4px solid #28a745;
+    }
+
+    @@media screen and (max-width: 768px) {
+        .modern-table-container {
+            padding: 10px;
+        }
+
+        .modern-table {
+            font-size: 0.75rem;
+        }
+
+        .modern-table td, 
+        .modern-table th {
+            padding: 4px 6px;
+            font-size: 0.7rem;
+        }
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
+        scrollbar-width: thin;
+    }
+
+    /* Personalización de la barra de desplazamiento */
+    .table-responsive::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: #28a745;
+        border-radius: 3px;
+    }
+
+    .btn-success {
+        background: linear-gradient(145deg, #28a745, #20c997);
+        border: none;
+        padding: 8px 15px;
+        font-size: 0.85rem;
+        box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .btn-success:hover {
+        transform: translateY(-1px);
+        box-shadow: 3px 3px 12px rgba(0,0,0,0.15);
+        background: linear-gradient(145deg, #20c997, #28a745);
+    }
+
+    .alert-danger-soft {
+        background-color: #ffe6e6;
+        border-color: #ffcccc;
+        color: #990000;
+    }
+
+    .custom-alert {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1050;
+        width: auto;
+        min-width: 300px;
+        max-width: 90%;
+        text-align: center;
+        padding: 15px 30px;
+        margin: 0;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+</style>
+
+<script>
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    let searchText = this.value.toLowerCase();
+    let rows = document.getElementsByClassName('property-row');
+
+    Array.from(rows).forEach(row => {
+        let text = row.textContent.toLowerCase();
+        if(text.includes(searchText)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+// Auto cerrar alerta después de 5 segundos
+document.addEventListener('DOMContentLoaded', function() {
+    let alerta = document.getElementById('alertaMensaje');
+    if(alerta) {
+        setTimeout(function() {
+            let bsAlert = new bootstrap.Alert(alerta);
+            bsAlert.close();
+        }, 5000);
+    }
+});
+
+// Inicializar tooltips de Bootstrap
+document.addEventListener('DOMContentLoaded', function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>

@@ -1,0 +1,183 @@
+@model Inmobiliaria_Rios.Models.Propiedad
+
+@{
+    ViewData["Title"] = Model?.Id > 0 ? "Editar Inmueble" : "Nuevo Inmueble";
+}
+
+<div class="text-center my-4">
+    <h1 class="display-4 text-primary">@(Model?.Id > 0 ? "Editar" : "Agregar") Inmueble</h1>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach (var modelError in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@modelError.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+        <form asp-action="@(Model?.Id > 0 ? "EditarInmueble" : "NuevoInmueble")" method="post" class="needs-validation" novalidate>
+            <input type="hidden" asp-for="Id" />
+            <div class="modern-form-container">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="Direccion" class="form-label">Dirección</label>
+                        <input asp-for="Direccion" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Localidad" class="form-label">Localidad</label>
+                        <input asp-for="Localidad" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Provincia" class="form-label">Provincia</label>
+                        <input asp-for="Provincia" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Tipo" class="form-label">Tipo de Propiedad</label>
+                        <select asp-for="Tipo" asp-items="Html.GetEnumSelectList<TipoPropiedad>()" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Ambientes" class="form-label">Ambientes</label>
+                        <input asp-for="Ambientes" type="number" class="form-control" min="0" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Banos" class="form-label">Baños</label>
+                        <input asp-for="Banos" type="number" class="form-control" min="0" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Plantas" class="form-label">Plantas</label>
+                        <input asp-for="Plantas" type="number" class="form-control" min="0" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-check mb-3">
+                            <label asp-for="Garage" class="form-label">Garage</label>
+                            <select asp-for="Garage" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select" onchange="handleGarageChange(this.value)">
+                            </select>
+                        </div>
+                        <div id="capGarageContainer" style="display:@(Model?.Garage == EstadoSiNo.si ? "block" : "none");">
+                            <label asp-for="CapGarage" class="form-label">Capacidad Garage</label>
+                            <input asp-for="CapGarage" type="number" class="form-control" min="0" id="capGarageInput" value="@Model?.CapGarage">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label asp-for="Patio" class="form-label">Patio</label>
+                                <select asp-for="Patio" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select">
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label asp-for="Piscina" class="form-label">Piscina</label>
+                                <select asp-for="Piscina" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select">
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label asp-for="Terraza" class="form-label">Terraza</label>
+                                <select asp-for="Terraza" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select">
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label asp-for="Cocina" class="form-label">Cocina</label>
+                                <select asp-for="Cocina" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select">
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label asp-for="Parrilla" class="form-label">Parrilla</label>
+                                <select asp-for="Parrilla" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Opcion" class="form-label">Opción</label>
+                        <select asp-for="Opcion" class="form-select" required>
+                            <option value="">Seleccione...</option>
+                            <option value="Venta">Venta</option>
+                            <option value="Alquiler">Alquiler</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Precio" class="form-label">Precio (USD)</label>
+                        <input asp-for="Precio" type="number" class="form-control" min="0" step="0.01" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Estado" class="form-label">Estado</label>
+                        <select asp-for="Estado" class="form-select">
+                            <option value="true" selected="@Model?.Estado == true">Disponible</option>
+                            <option value="false" selected="@Model?.Estado == false">No Disponible</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Observaciones" class="form-label">Observaciones</label>
+                        <textarea asp-for="Observaciones" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <input type="hidden" asp-for="Estado" value="true" />
+
+                    <div class="col-12 mt-4 text-center">
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="bi bi-check-circle me-2"></i>Guardar
+                        </button>
+                        <a href="@Url.Action("Propiedades", "Home")" class="btn btn-secondary">
+                            <i class="bi bi-x-circle me-2"></i>Cancelar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .modern-form-container {
+        background: linear-gradient(145deg, #ffffff, #f5f5f5);
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 5px 5px 15px rgba(0,0,0,0.1),
+                    -5px -5px 15px rgba(255,255,255,0.8);
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        border-color: #28a745;
+    }
+</style>
+
+<script>
+    function handleGarageChange(value) {
+        const container = document.getElementById('capGarageContainer');
+        const input = document.getElementById('capGarageInput');
+        
+        if (value === 'si') { // 'si' corresponde al valor del enum EstadoSiNo
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+            input.value = ''; // Dejamos vacío para que se guarde como null
+        }
+    }
+
+    // Inicializar el estado al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+        handleGarageChange(document.querySelector('[asp-for="Garage"]').value);
+    });
+</script>

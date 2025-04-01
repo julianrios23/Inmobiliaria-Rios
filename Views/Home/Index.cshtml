@@ -1,8 +1,84 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model dynamic
+
+@{
+    ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="min-vh-100" style="padding-top: 5px;">
+    <div class="text-center mb-3">
+        <h1 class="display-4 text-primary">Bienvenidos</h1>
+        <p class="lead text-secondary">Encuentra tu propiedad ideal con nosotros.</p>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div id="carouselImagenes" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="3000" data-bs-wrap="true">
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#carouselImagenes" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#carouselImagenes" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#carouselImagenes" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        <button type="button" data-bs-target="#carouselImagenes" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                        <button type="button" data-bs-target="#carouselImagenes" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                    </div>
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <a href="#link1">
+                                <img src="https://i.pinimg.com/736x/14/96/31/14963194d19315a727991b61c18a1d0b.jpg" class="d-block w-100 rounded" alt="Imagen 1" style="max-height: 600px; object-fit: contain;">
+                            </a>
+                        </div>
+                        <div class="carousel-item">
+                            <a href="#link2">
+                                <img src="https://i.pinimg.com/736x/c3/52/9d/c3529d726c3974cd23f9aabd0441bbd0.jpg" class="d-block w-100 rounded" alt="Imagen 2" style="max-height: 600px; object-fit: contain;">
+                            </a>
+                        </div>
+                        <div class="carousel-item">
+                            <a href="#link3">
+                                <img src="https://i.pinimg.com/736x/a6/7d/4d/a67d4db3a2b1a779c6e91943e79bd77e.jpg" class="d-block w-100 rounded" alt="Imagen 3" style="max-height: 600px; object-fit: contain;">
+                            </a>
+                        </div>
+                        <div class="carousel-item">
+                            <a href="#link4">
+                                <img src="https://i.pinimg.com/736x/3e/eb/bf/3eebbf9d89516d245e779362e93c39b3.jpg" class="d-block w-100 rounded" alt="Imagen 4" style="max-height: 600px; object-fit: contain;">
+                            </a>
+                        </div>
+                        <div class="carousel-item">
+                            <a href="#link5">
+                                <img src="https://i.pinimg.com/736x/14/96/31/14963194d19315a727991b61c18a1d0b.jpg" class="d-block w-100 rounded" alt="Imagen 5" style="max-height: 600px; object-fit: contain;">
+                            </a>
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselImagenes" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselImagenes" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Siguiente</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    body {
+        overflow-y: auto;
+    }
+    
+    .carousel-item img {
+        height: calc(100vh - 250px);
+        object-fit: cover;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var myCarousel = document.querySelector('#carouselImagenes')
+        var carousel = new bootstrap.Carousel(myCarousel, {
+            interval: 3000,
+            wrap: true
+        })
+    });
+</script>

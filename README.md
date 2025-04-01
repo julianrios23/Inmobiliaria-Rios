@@ -1,2 +1,6 @@
 # Inmobiliaria-Rios
-Proyecto mvc
+
+Proyecto mvc Lab II .NET - 2025
+
+
+
