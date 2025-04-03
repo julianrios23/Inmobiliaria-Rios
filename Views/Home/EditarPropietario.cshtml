@@ -1,0 +1,142 @@
+@model Inmobiliaria_Rios.Models.Propietario
+
+@{
+    ViewData["Title"] = "Editar Propietario";
+}
+
+<h1 class="text-primary">Editar Propietario</h1>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success show custom-alert" role="alert" id="alertaMensaje">
+        @TempData["Mensaje"]
+    </div>
+}
+
+<form asp-action="EditarPropietario" method="post" id="editarPropietarioForm" onsubmit="return confirmSave()">
+    <input type="hidden" asp-for="Id" />
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Nombre">Nombre</label>
+                <input asp-for="Nombre" class="form-control" required />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Apellido">Apellido</label>
+                <input asp-for="Apellido" class="form-control" required />
+                <span asp-validation-for="Apellido" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="DNI">DNI</label>
+                <input asp-for="DNI" class="form-control" required />
+                <span asp-validation-for="DNI" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="CUIT">CUIT</label>
+                <input asp-for="CUIT" class="form-control" />
+                <span asp-validation-for="CUIT" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Telefono">Teléfono</label>
+                <input asp-for="Telefono" class="form-control" />
+                <span asp-validation-for="Telefono" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Mail">Mail</label>
+                <input asp-for="Mail" class="form-control" />
+                <span asp-validation-for="Mail" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Domicilio">Domicilio</label>
+                <input asp-for="Domicilio" class="form-control" />
+                <span asp-validation-for="Domicilio" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Localidad">Localidad</label>
+                <input asp-for="Localidad" class="form-control" />
+                <span asp-validation-for="Localidad" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Provincia">Provincia</label>
+                <input asp-for="Provincia" class="form-control" />
+                <span asp-validation-for="Provincia" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Estado">Estado</label>
+                <select asp-for="Estado" class="form-select">
+                    <option value="true" selected="@Model.Estado">Activo</option>
+                    <option value="false" selected="@(Model.Estado == false)">Inactivo</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-3">
+        <button type="submit" class="btn btn-primary" id="guardarBtn" disabled>Guardar</button>
+        <a href="@Url.Action("Propietarios", "Home")" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>
+
+<div id="confirmModal" class="modal" tabindex="-1" style="display: none;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmación</h5>
+                <button type="button" class="btn-close" onclick="closeModal()"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de que desea guardar los cambios?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="submitForm()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        let form = document.getElementById('editarPropietarioForm');
+        let confirmModal = document.getElementById('confirmModal');
+
+        function confirmSave() {
+            confirmModal.style.display = 'block';
+            return false; // Evita el envío del formulario hasta que se confirme
+        }
+
+        function closeModal() {
+            confirmModal.style.display = 'none';
+        }
+
+        function submitForm() {
+            confirmModal.style.display = 'none';
+            form.submit(); // Envía el formulario después de confirmar
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const guardarBtn = document.getElementById('guardarBtn');
+            const originalData = new FormData(form);
+
+            function checkForChanges() {
+                const currentData = new FormData(form);
+                let isChanged = false;
+
+                for (let [key, value] of currentData.entries()) {
+                    if (originalData.get(key) !== value) {
+                        isChanged = true;
+                        break;
+                    }
+                }
+
+                guardarBtn.disabled = !isChanged;
+            }
+
+            form.addEventListener('input', checkForChanges);
+            form.addEventListener('change', checkForChanges);
+        });
+    </script>
+}

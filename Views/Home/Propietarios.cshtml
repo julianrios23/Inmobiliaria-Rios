@@ -9,7 +9,7 @@
     
     @if (TempData["Mensaje"] != null)
     {
-        <div class="alert alert-success show position-fixed custom-alert" role="alert" id="alertaMensaje">
+        <div class="alert alert-success show custom-alert" role="alert" id="alertaMensaje">
             @TempData["Mensaje"]
         </div>
     }
@@ -30,14 +30,14 @@
     </div>
 </div>
 
-<div class="table-responsive modern-table-container">
+<div class="table-responsive modern-table-container" style="max-height: 400px; overflow-y: auto;">
     <table class="table table-hover modern-table">
         <thead>
             <tr>
                 <th>Nombre</th>
                 <th>Apellido</th>
                 <th>DNI</th>
-                <th>CUIT</th>
+                <th>CUIT/CUIL</th>
                 <th>Teléfono</th>
                 <th>Mail</th>
                 <th>Domicilio</th>
@@ -48,7 +48,7 @@
         <tbody id="tableBody">
             @foreach(var propietario in Model)
             {
-                <tr class="align-middle">
+                <tr class="align-middle" style="cursor: pointer;" onclick="window.location.href='@Url.Action("EditarPropietario", "Home", new { id = propietario.Id })'">
                     <td>@propietario.Nombre</td>
                     <td>@propietario.Apellido</td>
                     <td>@propietario.DNI</td>
@@ -103,7 +103,23 @@
         padding: 20px;
         box-shadow: 10px 10px 20px rgba(0,0,0,0.05),
                     -10px -10px 20px rgba(255,255,255,0.8);
+        max-height: 400px; /* Limita la altura a 8 filas aproximadamente */
+        overflow-y: auto; /* Habilita el scroll vertical */
     }
+
+    .modern-table-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .modern-table-container::-webkit-scrollbar-thumb {
+        background-color: #28a745;
+        border-radius: 4px;
+    }
+
+    .modern-table-container::-webkit-scrollbar-track {
+        background-color: #f1f1f1;
+    }
+
     .modern-table {
         border-collapse: separate;
         border-spacing: 0;
@@ -141,6 +157,25 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+    .custom-alert {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1050;
+        width: auto;
+        min-width: 300px;
+        max-width: 90%;
+        text-align: center;
+        padding: 15px 30px;
+        margin: 0;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+        border-radius: 8px;
+    }
 </style>
 
 <script>
@@ -150,5 +185,15 @@
         rows.forEach(row => {
             row.style.display = row.textContent.toLowerCase().includes(searchText) ? '' : 'none';
         });
+    });
+
+    // Auto cerrar alerta después de 3 segundos
+    document.addEventListener('DOMContentLoaded', function () {
+        let alerta = document.getElementById('alertaMensaje');
+        if (alerta) {
+            setTimeout(function () {
+                alerta.style.display = 'none';
+            }, 3000);
+        }
     });
 </script>

@@ -103,6 +103,62 @@ public class HomeController : Controller
         return View();
     }
 
+    [HttpPost]
+    public IActionResult NuevoPropietario(Propietario propietario)
+    {
+        if (ModelState.IsValid)
+        {
+            if (_context.Propietarios.Any(p => p.DNI == propietario.DNI))
+            {
+                ModelState.AddModelError("DNI", "El DNI ingresado ya está registrado.");
+                return View(propietario);
+            }
+
+            try
+            {
+                _context.Propietarios.Add(propietario);
+                _context.SaveChanges();
+                TempData["Mensaje"] = "Propietario guardado exitosamente";
+                return RedirectToAction("Propietarios");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Error al guardar el propietario: " + ex.Message);
+            }
+        }
+        return View(propietario);
+    }
+
+    public IActionResult EditarPropietario(int id)
+    {
+        var propietario = _context.Propietarios.Find(id);
+        if (propietario == null)
+        {
+            return NotFound();
+        }
+        return View(propietario);
+    }
+
+    [HttpPost]
+    public IActionResult EditarPropietario(Propietario propietario)
+    {
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                _context.Update(propietario);
+                _context.SaveChanges();
+                TempData["Mensaje"] = "Propietario actualizado exitosamente";
+                return RedirectToAction("Propietarios");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Error al actualizar el propietario: " + ex.Message);
+            }
+        }
+        return View(propietario);
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

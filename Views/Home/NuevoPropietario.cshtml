@@ -1,0 +1,167 @@
+@model Inmobiliaria_Rios.Models.Propietario
+
+@{
+    ViewData["Title"] = "Nuevo Propietario";
+}
+
+<h1 class="text-primary">Datos Nuevo Propietario</h1>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success show custom-alert" role="alert" id="alertaMensaje">
+        @TempData["Mensaje"]
+    </div>
+}
+
+<form asp-action="NuevoPropietario" method="post" id="propietarioForm" onsubmit="return confirmSave()">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Nombre">Nombre</label>
+                <input asp-for="Nombre" class="form-control" required />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Apellido">Apellido</label>
+                <input asp-for="Apellido" class="form-control" required />
+                <span asp-validation-for="Apellido" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="DNI">DNI</label>
+                <input asp-for="DNI" class="form-control" required />
+                <span asp-validation-for="DNI" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="CUIT">CUIT/CUIL</label>
+                <input asp-for="CUIT" class="form-control" required />
+                <span asp-validation-for="CUIT" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Telefono">Teléfono</label>
+                <input asp-for="Telefono" class="form-control" required />
+                <span asp-validation-for="Telefono" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Mail">Mail</label>
+                <input asp-for="Mail" class="form-control" required />
+                <span asp-validation-for="Mail" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Domicilio">Domicilio</label>
+                <input asp-for="Domicilio" class="form-control" required />
+                <span asp-validation-for="Domicilio" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Localidad">Localidad</label>
+                <input asp-for="Localidad" class="form-control" required />
+                <span asp-validation-for="Localidad" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Provincia">Provincia</label>
+                <input asp-for="Provincia" class="form-control" required />
+                <span asp-validation-for="Provincia" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-3">
+        <button type="submit" class="btn btn-primary" id="guardarBtn" disabled>Guardar</button>
+        <a href="@Url.Action("Propietarios", "Home")" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>
+
+<div id="confirmModal" class="modal" tabindex="-1" style="display: none;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmación</h5>
+                <button type="button" class="btn-close" onclick="closeModal()"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de que desea guardar este propietario?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="submitForm()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        let form = document.getElementById('propietarioForm');
+        let confirmModal = document.getElementById('confirmModal');
+
+        function confirmSave() {
+            confirmModal.style.display = 'block';
+            return false; // Evita el envío del formulario hasta que se confirme
+        }
+
+        function closeModal() {
+            confirmModal.style.display = 'none';
+        }
+
+        function submitForm() {
+            confirmModal.style.display = 'none';
+            form.submit(); // Envía el formulario después de confirmar
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const guardarBtn = document.getElementById('guardarBtn');
+            const inputs = form.querySelectorAll('input[required]');
+
+            function validateForm() {
+                let allFilled = true;
+                inputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        allFilled = false;
+                    }
+                });
+                guardarBtn.disabled = !allFilled;
+            }
+
+            inputs.forEach(input => {
+                input.addEventListener('input', validateForm);
+            });
+
+            validateForm(); // Validar al cargar la página
+        });
+    </script>
+}
+
+<style>
+    .custom-alert {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1050;
+        width: auto;
+        min-width: 300px;
+        max-width: 90%;
+        text-align: center;
+        padding: 15px 30px;
+        margin: 0;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+        border-radius: 8px;
+    }
+</style>
+
+<script>
+    // Auto cerrar alerta después de 3 segundos
+    document.addEventListener('DOMContentLoaded', function () {
+        let alerta = document.getElementById('alertaMensaje');
+        if (alerta) {
+            setTimeout(function () {
+                alerta.style.display = 'none';
+            }, 3000);
+        }
+    });
+</script>
