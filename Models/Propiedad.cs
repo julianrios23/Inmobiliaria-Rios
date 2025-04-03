@@ -18,38 +18,52 @@ namespace Inmobiliaria_Rios.Models
         si = 1
     }
 
+    [Table("inmuebles")] // Mapea la tabla inmuebles
     public class Propiedad
     {
+        [Column("idinmuebles")] // Mapea la columna idinmuebles
         public int Id { get; set; }
+
+        [Column("idpropietario")] // Mapea la columna idpropietario
+        public int IdPropietario { get; set; }
+
         public required string Direccion { get; set; }
         public required string Localidad { get; set; }
         public required string Provincia { get; set; }
 
         [Column(TypeName = "varchar(20)")]
-        public TipoPropiedad Tipo { get; set; }
+        public string Tipo { get; set; } = string.Empty; // Cambiado a string si en la base de datos es varchar
 
         public required int Ambientes { get; set; }
         public required int Banos { get; set; }
 
         [Column(TypeName = "varchar(2)")]
-        public EstadoSiNo Garage { get; set; } = EstadoSiNo.no;
+        public string Garage { get; set; } = "no"; // Cambiado a string si en la base de datos es varchar
+
+        [Column("capGarage")]
         public int? CapGarage { get; set; } = null;
 
         [Column(TypeName = "varchar(2)")]
-        public EstadoSiNo Patio { get; set; }
+        public string Patio { get; set; } = "no"; // Cambiado a string si en la base de datos es varchar
+
         [Column(TypeName = "varchar(2)")]
-        public EstadoSiNo Piscina { get; set; }
+        public string Piscina { get; set; } = "no"; // Cambiado a string si en la base de datos es varchar
+
         [Column(TypeName = "varchar(2)")]
-        public EstadoSiNo Terraza { get; set; }
+        public string Terraza { get; set; } = "no"; // Cambiado a string si en la base de datos es varchar
+
         public required int Plantas { get; set; }
 
         [Column(TypeName = "varchar(2)")]
-        public EstadoSiNo Cocina { get; set; }
+        public string Cocina { get; set; } = "no"; // Cambiado a string si en la base de datos es varchar
+
         [Column(TypeName = "varchar(2)")]
-        public EstadoSiNo Parrilla { get; set; }
+        public string Parrilla { get; set; } = "no"; // Cambiado a string si en la base de datos es varchar
+
         public required string Opcion { get; set; }
         public required int Precio { get; set; }
         public string? Observaciones { get; set; }
+
         public bool Estado { get; set; } = true;
 
         // Constructor sin parámetros para Entity Framework

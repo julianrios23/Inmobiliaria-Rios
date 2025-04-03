@@ -12,6 +12,27 @@ html {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
+.btn, .btn-success, .btn-secondary {
+  background: linear-gradient(145deg, #28a745, #20c997);
+  border: none;
+  padding: 8px 15px;
+  font-size: 0.85rem;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  color: white;
+  text-decoration: none;
+}
+
+.btn:hover, .btn-success:hover, .btn-secondary:hover {
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 12px rgba(0,0,0,0.15);
+  background: linear-gradient(145deg, #20c997, #28a745);
+}
+
+.btn:focus, .btn:active:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
 html {
   position: relative;
   min-height: 100%;
@@ -30,4 +51,27 @@ body {
 
 footer {
   margin-top: auto;
+}
+
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600 !important;
+  font-size: 3rem !important;
+  color: #212529 !important; /* Color del bg-dark de Bootstrap */
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3) !important;
+  margin-bottom: 30px !important;
+  text-align: center !important;
+}
+
+h1 span {
+  color: #6c757d !important; /* Color de acento gris */
+}
+
+.uniform-select {
+  width: 100%; /* Asegura que todos los select ocupen el mismo ancho */
+  height: 38px; /* Altura uniforme */
+  font-size: 0.9rem; /* Tamaño de fuente consistente */
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
 }

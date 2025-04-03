@@ -1,4 +1,5 @@
 @model Inmobiliaria_Rios.Models.Propiedad
+@using Inmobiliaria_Rios.Models 
 
 @{
     ViewData["Title"] = Model?.Id > 0 ? "Editar Inmueble" : "Nuevo Inmueble";
@@ -21,7 +22,7 @@
                 </ul>
             </div>
         }
-        <form asp-action="@(Model?.Id > 0 ? "EditarInmueble" : "NuevoInmueble")" method="post" class="needs-validation" novalidate>
+        <form asp-action="@(Model?.Id > 0 ? "EditarInmueble" : "NuevoInmueble")" method="post" class="needs-validation" novalidate oninput="validateForm()">
             <input type="hidden" asp-for="Id" />
             <div class="modern-form-container">
                 <div class="row g-3">
@@ -39,7 +40,7 @@
                     </div>
                     <div class="col-md-6">
                         <label asp-for="Tipo" class="form-label">Tipo de Propiedad</label>
-                        <select asp-for="Tipo" asp-items="Html.GetEnumSelectList<TipoPropiedad>()" class="form-select" required>
+                        <select asp-for="Tipo" asp-items="Html.GetEnumSelectList<TipoPropiedad>()" class="form-select uniform-select" required>
                             <option value="">Seleccione...</option>
                         </select>
                     </div>
@@ -59,10 +60,10 @@
                     <div class="col-md-6">
                         <div class="form-check mb-3">
                             <label asp-for="Garage" class="form-label">Garage</label>
-                            <select asp-for="Garage" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select" onchange="handleGarageChange(this.value)">
+                            <select asp-for="Garage" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select uniform-select" onchange="handleGarageChange(this.value)">
                             </select>
                         </div>
-                        <div id="capGarageContainer" style="display:@(Model?.Garage == EstadoSiNo.si ? "block" : "none");">
+                        <div id="capGarageContainer" style="display:@(Model?.Garage.ToString().ToLower() == "si" ? "block" : "none");">
                             <label asp-for="CapGarage" class="form-label">Capacidad Garage</label>
                             <input asp-for="CapGarage" type="number" class="form-control" min="0" id="capGarageInput" value="@Model?.CapGarage">
                         </div>
@@ -72,27 +73,27 @@
                         <div class="row g-2">
                             <div class="col-6">
                                 <label asp-for="Patio" class="form-label">Patio</label>
-                                <select asp-for="Patio" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select">
+                                <select asp-for="Patio" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select uniform-select">
                                 </select>
                             </div>
                             <div class="col-6">
                                 <label asp-for="Piscina" class="form-label">Piscina</label>
-                                <select asp-for="Piscina" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select">
+                                <select asp-for="Piscina" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select uniform-select">
                                 </select>
                             </div>
                             <div class="col-6">
                                 <label asp-for="Terraza" class="form-label">Terraza</label>
-                                <select asp-for="Terraza" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select">
+                                <select asp-for="Terraza" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select uniform-select">
                                 </select>
                             </div>
                             <div class="col-6">
                                 <label asp-for="Cocina" class="form-label">Cocina</label>
-                                <select asp-for="Cocina" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select">
+                                <select asp-for="Cocina" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select uniform-select">
                                 </select>
                             </div>
                             <div class="col-6">
                                 <label asp-for="Parrilla" class="form-label">Parrilla</label>
-                                <select asp-for="Parrilla" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select">
+                                <select asp-for="Parrilla" asp-items="Html.GetEnumSelectList<EstadoSiNo>()" class="form-select uniform-select">
                                 </select>
                             </div>
                         </div>
@@ -100,7 +101,7 @@
 
                     <div class="col-md-6">
                         <label asp-for="Opcion" class="form-label">Opción</label>
-                        <select asp-for="Opcion" class="form-select" required>
+                        <select asp-for="Opcion" class="form-select uniform-select" required>
                             <option value="">Seleccione...</option>
                             <option value="Venta">Venta</option>
                             <option value="Alquiler">Alquiler</option>
@@ -108,13 +109,13 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label asp-for="Precio" class="form-label">Precio (USD)</label>
+                        <label asp-for="Precio" class="form-label">Precio</label>
                         <input asp-for="Precio" type="number" class="form-control" min="0" step="0.01" required>
                     </div>
 
                     <div class="col-md-6">
                         <label asp-for="Estado" class="form-label">Estado</label>
-                        <select asp-for="Estado" class="form-select">
+                        <select asp-for="Estado" class="form-select uniform-select">
                             <option value="true" selected="@Model?.Estado == true">Disponible</option>
                             <option value="false" selected="@Model?.Estado == false">No Disponible</option>
                         </select>
@@ -128,7 +129,7 @@
                     <input type="hidden" asp-for="Estado" value="true" />
 
                     <div class="col-12 mt-4 text-center">
-                        <button type="submit" class="btn btn-success me-2">
+                        <button type="submit" class="btn btn-success me-2" id="submitButton" disabled>
                             <i class="bi bi-check-circle me-2"></i>Guardar
                         </button>
                         <a href="@Url.Action("Propiedades", "Home")" class="btn btn-secondary">
@@ -161,6 +162,10 @@
         box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
         border-color: #28a745;
     }
+
+    .uniform-select {
+        width: 100%;
+    }
 </style>
 
 <script>
@@ -168,16 +173,41 @@
         const container = document.getElementById('capGarageContainer');
         const input = document.getElementById('capGarageInput');
         
-        if (value === 'si') { // 'si' corresponde al valor del enum EstadoSiNo
+        // Muestra el campo si el valor es "Si" (insensible a mayúsculas/minúsculas)
+        if (value.toLowerCase() === 'si') {
             container.style.display = 'block';
+            input.setAttribute('required', 'required');
         } else {
             container.style.display = 'none';
-            input.value = ''; // Dejamos vacío para que se guarde como null
+            input.removeAttribute('required');
+            input.value = ''; // Resetear el valor cuando se oculta
         }
+
+        // Volver a validar el formulario después del cambio
+        validateForm();
     }
 
     // Inicializar el estado al cargar la página
     document.addEventListener('DOMContentLoaded', function() {
         handleGarageChange(document.querySelector('[asp-for="Garage"]').value);
+    });
+
+    function validateForm() {
+        const form = document.querySelector('.needs-validation');
+        const inputs = form.querySelectorAll('input[required], select[required]');
+        const submitButton = document.getElementById('submitButton');
+        let isValid = true;
+
+        inputs.forEach(input => {
+            if (!input.value.trim()) {
+                isValid = false;
+            }
+        });
+
+        submitButton.disabled = !isValid;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        validateForm(); // Inicializa el estado del botón al cargar la página
     });
 </script>

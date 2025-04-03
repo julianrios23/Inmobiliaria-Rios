@@ -1,14 +1,15 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Inmobiliaria_Rios.Models;
+using ApplicationDbContextAlias = Inmobiliaria_Rios.Data.ApplicationDbContext;  // Alias para resolver la ambigüedad
 
 namespace Inmobiliaria_Rios.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ApplicationDbContextAlias _context;
 
-    public HomeController(ApplicationDbContext context)
+    public HomeController(ApplicationDbContextAlias context)
     {
         _context = context;
     }
@@ -83,6 +84,23 @@ public class HomeController : Controller
             }
         }
         return View("NuevoInmueble", propiedad);
+    }
+
+    public IActionResult Clientes()
+    {
+        var clientes = _context.Clientes.ToList(); // Recupera todos los clientes de la BD
+        return View(clientes); // Envía la lista de clientes a la vista
+    }
+
+    public IActionResult Propietarios()
+    {
+        var propietarios = _context.Propietarios.ToList(); // Recupera todos los propietarios de la BD
+        return View(propietarios);
+    }
+
+    public IActionResult NuevoPropietario()
+    {
+        return View();
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

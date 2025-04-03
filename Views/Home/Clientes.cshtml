@@ -1,0 +1,152 @@
+@model IEnumerable<Inmobiliaria_Rios.Models.Cliente>
+
+@{
+    ViewData["Title"] = "Clientes";
+}
+
+<div class="text-center my-4">
+    <h1 class="display-4 text-primary">Clientes</h1>
+    
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-success show position-fixed custom-alert" role="alert" id="alertaMensaje">
+            @TempData["Mensaje"]
+        </div>
+    }
+</div>
+
+<div class="row mb-2 align-items-center">
+    <div class="col-md-3 col-sm-6">
+        <div class="search-container">
+            <span class="search-icon"><i class="bi bi-search"></i></span>
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar...">
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 ms-auto">
+        <a href="@Url.Action("NuevoCliente", "Home")" class="btn btn-success btn-sm w-100 d-flex align-items-center justify-content-center">
+            <i class="bi bi-plus-circle me-2"></i>
+            <span>Nuevo Cliente</span>
+        </a>
+    </div>
+</div>
+
+<div class="table-responsive modern-table-container">
+    <table class="table table-hover modern-table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>DNI</th>
+                <th>Teléfono</th>
+                <th>Email</th>
+                <th>Domicilio</th>
+                <th>Localidad</th>
+                <th>Provincia</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            @foreach(var cliente in Model)
+            {
+                <tr class="align-middle">
+                    <td>@cliente.Nombre</td>
+                    <td>@cliente.Apellido</td>
+                    <td>@cliente.DNI</td>
+                    <td>@cliente.Telefono</td>
+                    <td>@cliente.Email</td>
+                    <td>@cliente.Domicilio</td>
+                    <td>@cliente.Localidad</td>
+                    <td>@cliente.Provincia</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .search-container {
+        position: relative;
+        background: linear-gradient(145deg, #ffffff, #f0f0f0);
+        border-radius: 8px;
+        padding: 2px;
+        box-shadow: 2px 2px 8px rgba(0,0,0,0.1),
+                   -2px -2px 8px rgba(255,255,255,0.8);
+        margin-bottom: 10px;
+    }
+    .search-input {
+        width: 100%;
+        padding: 6px 30px;
+        border: none;
+        background: transparent;
+        font-size: 0.85rem;
+        color: #333;
+        outline: none;
+        height: 32px;
+    }
+    .search-icon {
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        font-size: 0.85rem;
+    }
+    @@media screen and (max-width: 768px) {
+        .search-container { margin-bottom: 8px; }
+        .search-input { padding: 4px 25px; font-size: 0.8rem; height: 28px; }
+        .search-icon { left: 6px; font-size: 0.8rem; }
+    }
+    .modern-table-container {
+        background: linear-gradient(145deg, #ffffff, #f5f5f5);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 10px 10px 20px rgba(0,0,0,0.05),
+                    -10px -10px 20px rgba(255,255,255,0.8);
+    }
+    .modern-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        border: none;
+        font-size: 0.85rem;
+    }
+    .modern-table thead th {
+        background: linear-gradient(145deg, #28a745, #20c997);
+        color: white;
+        font-weight: 500;
+        padding: 8px;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        border: none;
+        white-space: nowrap;
+    }
+    .modern-table thead th:first-child { border-top-left-radius: 15px; }
+    .modern-table thead th:last-child { border-top-right-radius: 15px; }
+    .modern-table tbody tr {
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        transition: all 0.3s ease;
+    }
+    .modern-table tbody tr:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .modern-table td {
+        padding: 6px 8px;
+        border: none;
+        border-bottom: 1px solid #e9ecef;
+        white-space: nowrap;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let searchText = this.value.toLowerCase();
+        let rows = document.querySelectorAll('.modern-table tbody tr');
+        rows.forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(searchText) ? '' : 'none';
+        });
+    });
+</script>

@@ -11,10 +11,15 @@ namespace Inmobiliaria_Rios.Data
         }
 
         public DbSet<Propiedad> Propiedades { get; set; }
+        public DbSet<Propietario> Propietarios { get; set; }
+        public DbSet<Cliente> Clientes { get; set; } // Agregado para la tabla clientes
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Configuración para la tabla inmuebles
+            modelBuilder.Entity<Propiedad>().ToTable("inmuebles");
 
             modelBuilder.Entity<Propiedad>()
                 .Property(e => e.Tipo)
@@ -23,6 +28,9 @@ namespace Inmobiliaria_Rios.Data
             modelBuilder.Entity<Propiedad>()
                 .Property(e => e.Garage)
                 .HasConversion<string>();
+
+            // Configuración para la tabla propietarios
+            modelBuilder.Entity<Propietario>().ToTable("propietarios");
 
             modelBuilder.Entity<Propiedad>()
                 .Property(e => e.Patio)
