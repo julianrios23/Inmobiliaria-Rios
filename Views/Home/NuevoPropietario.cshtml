@@ -4,7 +4,9 @@
     ViewData["Title"] = "Nuevo Propietario";
 }
 
-<h1 class="text-primary">Datos Nuevo Propietario</h1>
+<div class="text-center page-title-container">
+    <h1 class="display-4-text-primary">Datos Nuevo Propietario</h1>
+</div>
 
 @if (TempData["Mensaje"] != null)
 {
@@ -32,9 +34,9 @@
                 <span asp-validation-for="DNI" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label for="CUIT">CUIT/CUIL</label>
-                <input asp-for="CUIT" class="form-control" required />
-                <span asp-validation-for="CUIT" class="text-danger"></span>
+                <label asp-for="Cuit" class="control-label"></label> <!-- Cambiado de CUIT a Cuit -->
+                <input asp-for="Cuit" class="form-control" /> <!-- Cambiado de CUIT a Cuit -->
+                <span asp-validation-for="Cuit" class="text-danger"></span> <!-- Cambiado de CUIT a Cuit -->
             </div>
             <div class="form-group">
                 <label for="Telefono">Teléfono</label>
@@ -66,8 +68,12 @@
         </div>
     </div>
     <div class="text-center mt-3">
-        <button type="submit" class="btn btn-primary" id="guardarBtn" disabled>Guardar</button>
-        <a href="@Url.Action("Propietarios", "Home")" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-primary" id="guardarBtn" disabled>
+            <i class="bi bi-save me-2"></i>Guardar
+        </button>
+        <a href="@Url.Action("Propietarios", "Home")" class="btn btn-secondary">
+            <i class="bi bi-x-circle me-2"></i>Cancelar
+        </a>
     </div>
 </form>
 

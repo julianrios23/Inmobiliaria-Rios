@@ -3,70 +3,72 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Inmobiliaria_Rios.Models
 {
-    public enum TipoPropiedad : byte
-    {
-        casa = 0,
-        departamento = 1,
-        local = 2,
-        lote = 3,
-        cabana = 4
-    }
-
-    public enum EstadoSiNo : byte
-    {
-        no = 0,
-        si = 1
-    }
-
-    [Table("inmuebles")] // Mapea la tabla inmuebles
+    [Table("inmuebles")]
     public class Propiedad
     {
-        [Column("idinmuebles")] // Mapea la columna idinmuebles
+        [Key]
+        [Column("idinmuebles")]
         public int Id { get; set; }
 
-        [Column("idpropietario")] // Mapea la columna idpropietario
+        [Required(ErrorMessage = "El campo Propietario es obligatorio.")]
+        [Column("idpropietario")]
         public int IdPropietario { get; set; }
 
-        public required string Direccion { get; set; }
-        public required string Localidad { get; set; }
-        public required string Provincia { get; set; }
+        [ForeignKey("IdPropietario")]
+        public Propietario? Propietario { get; set; }
 
-        [Column(TypeName = "varchar(20)")]
-        public string Tipo { get; set; } = string.Empty; // Cambiado a string si en la base de datos es varchar
+        [Column("direccion")]
+        public string Direccion { get; set; } = string.Empty;
 
-        public required int Ambientes { get; set; }
-        public required int Banos { get; set; }
+        [Column("localidad")]
+        public string Localidad { get; set; } = string.Empty;
 
-        [Column(TypeName = "varchar(2)")]
-        public string Garage { get; set; } = "no"; // Cambiado a string si en la base de datos es varchar
+        [Column("provincia")]
+        public string Provincia { get; set; } = string.Empty;
+
+        [Column("tipo")]
+        public string Tipo { get; set; } = string.Empty;
+
+        [Column("ambientes")]
+        public int Ambientes { get; set; }
+
+        [Column("banos")]
+        public int Banos { get; set; }
+
+        [Column("garage")]
+        public string Garage { get; set; } = "no";
 
         [Column("capGarage")]
-        public int? CapGarage { get; set; } = null;
+        public int? CapGarage { get; set; }
 
-        [Column(TypeName = "varchar(2)")]
-        public string Patio { get; set; } = "no"; // Cambiado a string si en la base de datos es varchar
+        [Column("patio")]
+        public string Patio { get; set; } = "no";
 
-        [Column(TypeName = "varchar(2)")]
-        public string Piscina { get; set; } = "no"; // Cambiado a string si en la base de datos es varchar
+        [Column("piscina")]
+        public string Piscina { get; set; } = "no";
 
-        [Column(TypeName = "varchar(2)")]
-        public string Terraza { get; set; } = "no"; // Cambiado a string si en la base de datos es varchar
+        [Column("terraza")]
+        public string Terraza { get; set; } = "no";
 
-        public required int Plantas { get; set; }
+        [Column("plantas")]
+        public int Plantas { get; set; }
 
-        [Column(TypeName = "varchar(2)")]
-        public string Cocina { get; set; } = "no"; // Cambiado a string si en la base de datos es varchar
+        [Column("cocina")]
+        public string Cocina { get; set; } = "no";
 
-        [Column(TypeName = "varchar(2)")]
-        public string Parrilla { get; set; } = "no"; // Cambiado a string si en la base de datos es varchar
+        [Column("parrilla")]
+        public string Parrilla { get; set; } = "no";
 
-        public required string Opcion { get; set; }
-        public required int Precio { get; set; }
+        [Column("opcion")]
+        public string Opcion { get; set; } = string.Empty;
+
+        [Column("precio")]
+        public int Precio { get; set; }
+
+        [Column("observaciones")]
         public string? Observaciones { get; set; }
 
+        [Column("estado")]
         public bool Estado { get; set; } = true;
-
-        // Constructor sin parámetros para Entity Framework
-        public Propiedad() { }
     }
 }

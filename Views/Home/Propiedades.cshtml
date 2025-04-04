@@ -3,88 +3,25 @@
 @{
     ViewData["Title"] = "Inmuebles";
 }
-
-<div class="text-center my-4">
-    <h1 class="display-4 text-primary">Inmuebles</h1>
-    <p class="lead text-secondary">Explora nuestra lista de propiedades disponibles.</p>
-    @if (TempData["Mensaje"] != null)
-    {
-        <div class="alert alert-success show position-fixed custom-alert" role="alert" id="alertaMensaje">
-            @TempData["Mensaje"]
-        </div>
-    }
-</div>
-
-<div class="row mb-2 align-items-center">
-    <div class="col-md-3 col-sm-6">
-        <div class="search-container">
-            <span class="search-icon"><i class="bi bi-search"></i></span>
-            <input type="text" id="searchInput" class="search-input" placeholder="Buscar...">
-        </div>
-    </div>
-    <div class="col-md-3 col-sm-6 ms-auto">
-        <a href="@Url.Action("NuevoInmueble", "Home")" class="btn btn-success btn-sm w-100 d-flex align-items-center justify-content-center">
-            <i class="bi bi-plus-circle me-2"></i>
-            <span>Nuevo Inmueble</span>
-        </a>
-    </div>
-</div>
-
-<div class="table-responsive modern-table-container">
-    <table class="table table-hover modern-table">
-        <thead>
-            <tr>
-                <th>Localidad</th>
-                <th>Provincia</th>
-                <th>Dirección</th>            
-                <th>Tipo</th>
-                <th>Ambientes</th>
-                <th>Baño</th>
-                <th>Garage</th>
-                <th>Cap Garage</th>
-                <th>Patio</th>
-                <th>Piscina</th>
-                <th>Terraza</th>
-                <th>Plantas</th>
-                <th>Cocina</th>
-                <th>Parrilla</th>
-                <th>Opción</th>
-                <th>$</th>
-                <th>Obs</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-            @foreach (var propiedad in Model)
-            {
-                <tr class="align-middle property-row" style="cursor: pointer;" onclick="window.location.href='@Url.Action("EditarInmueble", "Home", new { id = propiedad.Id })'">
-                    <td>@propiedad.Localidad</td>
-                    <td>@propiedad.Provincia</td>
-                    <td>@propiedad.Direccion</td>
-                    <td>@propiedad.Tipo</td>
-                    <td>@propiedad.Ambientes</td>
-                    <td>@propiedad.Banos</td>
-                    <td class="text-center">@propiedad.Garage</td>
-                    <td class="text-center">@propiedad.CapGarage</td>
-                    <td class="text-center">@propiedad.Patio</td>
-                    <td class="text-center">@propiedad.Piscina</td>
-                    <td class="text-center">@propiedad.Terraza</td>
-                    <td class="text-center">@propiedad.Plantas</td>
-                    <td class="text-center">@propiedad.Cocina</td>
-                    <td class="text-center">@propiedad.Parrilla</td>
-                    <td class="text-center">@propiedad.Opcion</td>
-                    <td class="text-end">@string.Format("{0:C0}", propiedad.Precio)</td>
-                    <td>
-                        <span data-bs-toggle="tooltip" title="@propiedad.Observaciones">
-                            @propiedad.Observaciones
-                        </span>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
-
 <style>
+    #lead-text-secondary{
+        color: black;
+        font: sans-serif;
+        font-size: 2.50rem;        
+        text-align: center; 
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+    #display-4-text-primary{
+        font-family: 'Playfair Display', serif;
+        color: #333333;
+        font-size: 3.50rem;
+        font-weight: bold;
+        text-align: center; 
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
     .search-container {
         position: relative;
         background: linear-gradient(145deg, #ffffff, #f0f0f0);
@@ -138,6 +75,27 @@
         padding: 20px;
         box-shadow: 10px 10px 20px rgba(0,0,0,0.05),
                     -10px -10px 20px rgba(255,255,255,0.8);
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .modern-table-container::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .modern-table-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .modern-table-container::-webkit-scrollbar-thumb {
+        background: #28a745;
+        border-radius: 4px;
+    }
+
+    .modern-table-container::-webkit-scrollbar-thumb:hover {
+        background: #218838;
     }
 
     .modern-table {
@@ -160,12 +118,12 @@
         white-space: nowrap;
     }
 
-    .modern-table thead th:first-child {
-        border-top-left-radius: 15px;
+    .modern-table thead th:first-child { 
+        border-top-left-radius: 15px; 
     }
 
-    .modern-table thead th:last-child {
-        border-top-right-radius: 15px;
+    .modern-table thead th:last-child { 
+        border-top-right-radius: 15px; 
     }
 
     .modern-table tbody tr {
@@ -189,12 +147,12 @@
     }
 
     .property-row td:first-child {
-        border-left: 4px solid #28a745;
+        border-left: 3px solid #28a745;
     }
 
-    @@media screen and (max-width: 768px) {
+    @@media screen and (max-width: 1200px) {
         .modern-table-container {
-            padding: 10px;
+            height: calc(100vh - 220px);
         }
 
         .modern-table {
@@ -203,31 +161,8 @@
 
         .modern-table td, 
         .modern-table th {
-            padding: 4px 6px;
-            font-size: 0.7rem;
+            padding: 6px 8px;
         }
-    }
-
-    .table-responsive {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        max-width: 100%;
-        scrollbar-width: thin;
-    }
-
-    /* Personalización de la barra de desplazamiento */
-    .table-responsive::-webkit-scrollbar {
-        height: 6px;
-    }
-
-    .table-responsive::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 3px;
-    }
-
-    .table-responsive::-webkit-scrollbar-thumb {
-        background: #28a745;
-        border-radius: 3px;
     }
 
     .btn-success {
@@ -266,7 +201,146 @@
         font-size: 1.1rem;
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
+
+    .propietario-card {
+        border: 4px solid transparent;
+        animation: borderAnimation 2s infinite;
+    }
+
+    .propietario-card-header {
+        background-color: #28a745;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @@keyframes borderAnimation {
+        0% {
+            border-color: #28a745;
+        }
+        50% {
+            border-color: #20c997;
+        }
+        100% {
+            border-color: #28a745;
+        }
+    }
 </style>
+<div class="text-center page-title-container">
+    <h1 class="display-4-text-primary">Inmuebles</h1>
+    
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-success show position-fixed custom-alert" role="alert" id="alertaMensaje">
+            @TempData["Mensaje"]
+        </div>
+    }
+</div>
+
+<div class="row mb-2 align-items-center">
+    <div class="col-md-3 col-sm-6">
+        <div class="search-container">
+            <span class="search-icon"><i class="bi bi-search"></i></span>
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar...">
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 ms-auto">
+        <a href="@Url.Action("NuevoInmueble", "Home")" class="btn btn-success btn-sm px-4 py-2 d-flex align-items-center justify-content-center">
+            <i class="bi bi-plus-circle me-2"></i>
+            <span>Nuevo Inmueble</span>
+        </a>
+    </div>
+</div>
+
+<div class="table-responsive modern-table-container" style="max-height: 400px; overflow-y: auto;">
+    <table class="table table-hover modern-table">
+        <thead>
+            <tr>
+                <th>Propietario</th>
+                <th>Localidad</th>
+                <th>Provincia</th>
+                <th>Dirección</th>            
+                <th>Tipo</th>
+                <th>Ambientes</th>
+                <th>Baño</th>
+                <th>Garage</th>
+                <th>Cap Garage</th>
+                <th>Patio</th>
+                <th>Piscina</th>
+                <th>Terraza</th>
+                <th>Plantas</th>
+                <th>Cocina</th>
+                <th>Parrilla</th>
+                <th>Opción</th>
+                <th>$</th>
+                <th>Observaciones</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            @foreach (var propiedad in Model)
+            {
+                <tr class="align-middle property-row" style="cursor: pointer;" onclick="location.href='@Url.Action("EditarInmueble", "Home", new { id = propiedad.Id })'">
+                    <td>
+                        @if (propiedad.Propietario != null)
+                        {
+                            <a href="javascript:void(0);" onclick="event.stopPropagation(); showPropietarioCard(@propiedad.Propietario.Id)" class="text-decoration-none text-primary">
+                                @($"{propiedad.Propietario.Nombre} {propiedad.Propietario.Apellido}")
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Sin Propietario</span>
+                        }
+                    </td>
+                    <td>@propiedad.Localidad</td>
+                    <td>@propiedad.Provincia</td>
+                    <td>@propiedad.Direccion</td>
+                    <td>@propiedad.Tipo</td>
+                    <td>@propiedad.Ambientes</td>
+                    <td>@propiedad.Banos</td>
+                    <td class="text-center">@propiedad.Garage</td>
+                    <td class="text-center">@propiedad.CapGarage</td>
+                    <td class="text-center">@propiedad.Patio</td>
+                    <td class="text-center">@propiedad.Piscina</td>
+                    <td class="text-center">@propiedad.Terraza</td>
+                    <td class="text-center">@propiedad.Plantas</td>
+                    <td class="text-center">@propiedad.Cocina</td>
+                    <td class="text-center">@propiedad.Parrilla</td>
+                    <td class="text-center">@propiedad.Opcion</td>
+                    <td class="text-end">@string.Format("{0:C0}", propiedad.Precio)</td>
+                    <td>
+                        <span data-bs-toggle="tooltip" title="@propiedad.Observaciones">
+                            @propiedad.Observaciones
+                        </span>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div id="propietarioCard" class="card propietario-card position-fixed" style="display: none; z-index: 1050; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; border-radius: 15px; overflow: hidden;">
+    <div class="row g-0">
+        <div class="col-md-4 propietario-card-header">
+            <h5 class="card-title mb-0 text-center">Propietario</h5>
+        </div>
+        <div class="col-md-8">
+            <div class="card-body">
+                <p><strong>Nombre:</strong> <span id="propietarioNombre"></span></p>
+                <p><strong>Apellido:</strong> <span id="propietarioApellido"></span></p>
+                <p><strong>DNI:</strong> <span id="propietarioDNI"></span></p>
+                <p><strong>CUIT:</strong> <span id="propietarioCUIT"></span></p>
+                <p><strong>Teléfono:</strong> <span id="propietarioTelefono"></span></p>
+                <p><strong>Mail:</strong> <span id="propietarioMail"></span></p>
+                <p><strong>Domicilio:</strong> <span id="propietarioDomicilio"></span></p>
+                <p><strong>Localidad:</strong> <span id="propietarioLocalidad"></span></p>
+                <p><strong>Provincia:</strong> <span id="propietarioProvincia"></span></p>
+            </div>
+        </div>
+    </div>
+    <button type="button" class="btn-close position-absolute top-0 end-0 m-2" onclick="closePropietarioCard()" style="background-color: white;"></button>
+</div>
 
 <script>
 document.getElementById('searchInput').addEventListener('keyup', function() {
@@ -301,4 +375,27 @@ document.addEventListener('DOMContentLoaded', function () {
         new bootstrap.Tooltip(tooltipTriggerEl);
     });
 });
+
+function showPropietarioCard(propietarioId) {
+    fetch(`/Home/GetPropietario/${propietarioId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('propietarioNombre').textContent = data.nombre;
+            document.getElementById('propietarioApellido').textContent = data.apellido;
+            document.getElementById('propietarioDNI').textContent = data.dni;
+            document.getElementById('propietarioCUIT').textContent = data.cuit || 'N/A';
+            document.getElementById('propietarioTelefono').textContent = data.telefono || 'N/A';
+            document.getElementById('propietarioMail').textContent = data.mail || 'N/A';
+            document.getElementById('propietarioDomicilio').textContent = data.domicilio || 'N/A';
+            document.getElementById('propietarioLocalidad').textContent = data.localidad || 'N/A';
+            document.getElementById('propietarioProvincia').textContent = data.provincia || 'N/A';
+
+            document.getElementById('propietarioCard').style.display = 'block';
+        })
+        .catch(error => console.error('Error al obtener los datos del propietario:', error));
+}
+
+function closePropietarioCard() {
+    document.getElementById('propietarioCard').style.display = 'none';
+}
 </script>

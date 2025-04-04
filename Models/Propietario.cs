@@ -10,36 +10,32 @@ namespace Inmobiliaria_Rios.Models
         [Column("idpropietario")]
         public int Id { get; set; }
 
-        [Required]
         [Column("nombre")]
-        public required string Nombre { get; set; }
+        public string Nombre { get; set; } = string.Empty;
 
-        [Required]
         [Column("apellido")]
-        public required string Apellido { get; set; }
+        public string Apellido { get; set; } = string.Empty;
 
-        [Required]
         [Column("dni")]
-        public required int DNI { get; set; }
+        public int DNI { get; set; } // Cambiado de Dni a DNI
 
         [Column("cuit")]
-        public string CUIT { get; set; } = string.Empty;
+        public string? Cuit { get; set; }
 
         [Column("telefono")]
-        public string Telefono { get; set; } = string.Empty;
+        public string? Telefono { get; set; }
 
         [Column("mail")]
-        [EmailAddress(ErrorMessage = "El formato del correo electrónico no es válido.")]
-        public string Mail { get; set; } = string.Empty;
+        public string? Mail { get; set; }
 
         [Column("domicilio")]
-        public string Domicilio { get; set; } = string.Empty;
+        public string? Domicilio { get; set; }
 
         [Column("localidad")]
-        public string Localidad { get; set; } = string.Empty;
+        public string? Localidad { get; set; }
 
         [Column("provincia")]
-        public string Provincia { get; set; } = string.Empty;
+        public string? Provincia { get; set; }
 
         [Column("estado")]
         public bool Estado { get; set; } = true;

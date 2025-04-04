@@ -1,48 +1,12 @@
 @model Inmobiliaria_Rios.Models.Propiedad
-@using Inmobiliaria_Rios.Models
 
 @{
-    ViewData["Title"] = "Nuevo Inmueble";
+    ViewData["Title"] = "Editar Inmueble";
 }
-
-<style>
-    .display-4-text-primary {
-        font-family: 'Playfair Display', serif;
-        color: #333333;
-        font-size: 3.50rem;
-        font-weight: bold;
-        text-align: center; 
-        margin-top: 10px;
-        margin-bottom: 10px;
-    }
-
-    .form-label {
-        font-weight: 500;
-        color: #333;
-    }
-
-    .form-control, .form-select {
-        border-radius: 8px;
-        border: 1px solid #ced4da;
-        padding: 0.5rem 1rem;
-        transition: all 0.3s ease;
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: #28a745;
-        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-    }
-
-    .form-container {
-        height: calc(100vh - 120px);
-        overflow-y: auto;
-        padding: 20px;
-    }
-</style>
 
 <div class="form-container">
     <div class="container">
-        <h1 class="display-4-text-primary mb-4">Nuevo Inmueble</h1>
+        <h1 class="display-4-text-primary mb-4">Editar Inmueble</h1>
 
         @if (TempData["Error"] != null)
         {
@@ -53,46 +17,47 @@
             </div>
         }
 
-        <form asp-controller="Home" asp-action="GuardarInmueble" method="post" class="row g-3 needs-validation" id="nuevoInmuebleForm" onsubmit="return confirmSave()">
+        <form asp-controller="Home" asp-action="EditarInmueble" method="post" class="row g-3 needs-validation" novalidate id="editarInmuebleForm" onsubmit="return confirmSave()">
+            <input type="hidden" asp-for="Id" />
             <div class="col-md-6">
-                <label class="form-label">Buscar Propietario <span class="text-danger">*</span></label>
-                <div class="input-group">
-                    <input type="text" id="searchPropietario" class="form-control" placeholder="Buscar por nombre o apellido..." autocomplete="off" required>
-                    <button class="btn btn-success" type="button" id="limpiarBusqueda">
-                        <i class="bi bi-x-circle"></i>
-                    </button>
-                </div>
-                <input type="hidden" asp-for="IdPropietario" id="IdPropietario" />
+                <label class="form-label">Propietario</label>
+                <select asp-for="IdPropietario" class="form-select" disabled>
+                    <option value="">Seleccione un propietario...</option>
+                    @foreach (var propietario in ViewBag.Propietarios)
+                    {
+                        <option value="@propietario.Id" selected="@propietario.Id == Model.IdPropietario">
+                            @($"{propietario.Nombre} {propietario.Apellido}")
+                        </option>
+                    }
+                </select>
                 <span asp-validation-for="IdPropietario" class="text-danger"></span>
-                <div id="searchResults" class="list-group position-absolute" style="z-index: 1000; width: 95%;"></div>
-                <div id="propietarioInfo" class="mt-2"></div>
             </div>
 
             <div class="col-md-6">
                 <label asp-for="Tipo" class="form-label">Tipo de Inmueble</label>
-                <select asp-for="Tipo" class="form-select" required>
+                <select asp-for="Tipo" class="form-select" disabled>
                     <option value="">Seleccione tipo...</option>
-                    <option value="casa">Casa</option>
-                    <option value="departamento">Departamento</option>
-                    <option value="local">Local</option>
-                    <option value="lote">Lote</option>
-                    <option value="cabana">Cabaña</option>
+                    <option value="casa" selected="@(Model.Tipo == "casa")">Casa</option>
+                    <option value="departamento" selected="@(Model.Tipo == "departamento")">Departamento</option>
+                    <option value="local" selected="@(Model.Tipo == "local")">Local</option>
+                    <option value="lote" selected="@(Model.Tipo == "lote")">Lote</option>
+                    <option value="cabana" selected="@(Model.Tipo == "cabana")">Cabaña</option>
                 </select>
             </div>
 
             <div class="col-md-4">
                 <label asp-for="Direccion" class="form-label">Dirección</label>
-                <input asp-for="Direccion" class="form-control" required />
+                <input asp-for="Direccion" class="form-control" disabled />
             </div>
 
             <div class="col-md-4">
                 <label asp-for="Localidad" class="form-label">Localidad</label>
-                <input asp-for="Localidad" class="form-control" required />
+                <input asp-for="Localidad" class="form-control" disabled />
             </div>
 
             <div class="col-md-4">
                 <label asp-for="Provincia" class="form-label">Provincia</label>
-                <input asp-for="Provincia" class="form-control" required />
+                <input asp-for="Provincia" class="form-control" disabled />
             </div>
 
             <div class="col-md-12">
@@ -115,53 +80,53 @@
                     <div class="col">
                         <label asp-for="Garage" class="form-label">Garage</label>
                         <select asp-for="Garage" class="form-select" id="garageSelect">
-                            <option value="no">No</option>
-                            <option value="si">Si</option>
+                            <option value="no" selected="@(Model.Garage == "no")">No</option>
+                            <option value="si" selected="@(Model.Garage == "si")">Si</option>
                         </select>
                     </div>
 
                     <div class="col">
                         <label asp-for="CapGarage" class="form-label">Cap. Garage</label>
-                        <input asp-for="CapGarage" type="number" class="form-control" min="0" id="capGarageInput" disabled />
+                        <input asp-for="CapGarage" type="number" class="form-control" id="capGarageInput" min="0" disabled="@(Model.Garage == "no")" />
                     </div>
 
                     <div class="col">
                         <label asp-for="Patio" class="form-label">Patio</label>
                         <select asp-for="Patio" class="form-select">
-                            <option value="no">No</option>
-                            <option value="si">Si</option>
+                            <option value="no" selected="@(Model.Patio == "no")">No</option>
+                            <option value="si" selected="@(Model.Patio == "si")">Si</option>
                         </select>
                     </div>
 
                     <div class="col">
                         <label asp-for="Piscina" class="form-label">Piscina</label>
                         <select asp-for="Piscina" class="form-select">
-                            <option value="no">No</option>
-                            <option value="si">Si</option>
+                            <option value="no" selected="@(Model.Piscina == "no")">No</option>
+                            <option value="si" selected="@(Model.Piscina == "si")">Si</option>
                         </select>
                     </div>
 
                     <div class="col">
                         <label asp-for="Terraza" class="form-label">Terraza</label>
                         <select asp-for="Terraza" class="form-select">
-                            <option value="no">No</option>
-                            <option value="si">Si</option>
+                            <option value="no" selected="@(Model.Terraza == "no")">No</option>
+                            <option value="si" selected="@(Model.Terraza == "si")">Si</option>
                         </select>
                     </div>
 
                     <div class="col">
                         <label asp-for="Cocina" class="form-label">Cocina</label>
                         <select asp-for="Cocina" class="form-select">
-                            <option value="no">No</option>
-                            <option value="si">Si</option>
+                            <option value="no" selected="@(Model.Cocina == "no")">No</option>
+                            <option value="si" selected="@(Model.Cocina == "si")">Si</option>
                         </select>
                     </div>
 
                     <div class="col">
                         <label asp-for="Parrilla" class="form-label">Parrilla</label>
                         <select asp-for="Parrilla" class="form-select">
-                            <option value="no">No</option>
-                            <option value="si">Si</option>
+                            <option value="no" selected="@(Model.Parrilla == "no")">No</option>
+                            <option value="si" selected="@(Model.Parrilla == "si")">Si</option>
                         </select>
                     </div>
                 </div>
@@ -170,9 +135,8 @@
             <div class="col-md-4">
                 <label asp-for="Opcion" class="form-label">Opción</label>
                 <select asp-for="Opcion" class="form-select" required>
-                    <option value="">Seleccione opción...</option>
-                    <option value="alquiler">Alquiler</option>
-                    <option value="venta">Venta</option>
+                    <option value="alquiler" selected="@(Model.Opcion == "alquiler")">Alquiler</option>
+                    <option value="venta" selected="@(Model.Opcion == "venta")">Venta</option>
                 </select>
             </div>
 
@@ -187,7 +151,7 @@
             </div>
 
             <div class="col-12 text-center mt-4">
-                <button type="submit" class="btn btn-success me-2">
+                <button type="submit" class="btn btn-success me-2" id="guardarBtn" disabled>
                     <i class="bi bi-save"></i> Guardar
                 </button>
                 <a href="@Url.Action("Propiedades", "Home")" class="btn btn-secondary">
@@ -204,7 +168,7 @@
                         <button type="button" class="btn-close" onclick="closeModal()"></button>
                     </div>
                     <div class="modal-body">
-                        <p>¿Está seguro de que desea guardar este inmueble?</p>
+                        <p>¿Está seguro de que desea guardar los cambios?</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
@@ -218,69 +182,7 @@
 
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
-
     <script>
-        // ...existing validation code...
-
-        const searchInput = document.getElementById('searchPropietario');
-        const searchResults = document.getElementById('searchResults');
-        const idPropietarioInput = document.getElementById('IdPropietario');
-        const propietarioInfo = document.getElementById('propietarioInfo');
-
-        searchInput.addEventListener('input', function () {
-            const searchTerm = this.value.trim();
-
-            if (searchTerm.length < 2) {
-                searchResults.innerHTML = '';
-                return;
-            }
-
-            fetch(`/Home/BuscarPropietario?searchTerm=${encodeURIComponent(searchTerm)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.results.length > 0) {
-                        searchResults.innerHTML = data.results.map(p => `
-                            <a href="#" class="list-group-item list-group-item-action"
-                               onclick="seleccionarPropietario(${p.id}, '${p.nombre}', '${p.apellido}', ${p.dni}); return false;">
-                                ${p.texto}
-                            </a>
-                        `).join('');
-                    } else {
-                        searchResults.innerHTML = '<div class="list-group-item text-danger">No se encontraron resultados</div>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error al buscar propietarios:', error);
-                    searchResults.innerHTML = '<div class="list-group-item text-danger">Error al buscar propietarios</div>';
-                });
-        });
-
-        function seleccionarPropietario(id, nombre, apellido, dni) {
-            idPropietarioInput.value = id;
-            searchInput.value = `${nombre} ${apellido}`;
-            propietarioInfo.innerHTML = `
-                <div class="alert alert-success">
-                    <strong>Propietario seleccionado:</strong><br>
-                    ${nombre} ${apellido}<br>
-                    DNI: ${dni}
-                </div>`;
-            searchResults.innerHTML = '';
-        }
-
-        document.getElementById('limpiarBusqueda').addEventListener('click', function () {
-            searchInput.value = '';
-            idPropietarioInput.value = '';
-            propietarioInfo.innerHTML = '';
-            searchResults.innerHTML = '';
-        });
-
-        // Cerrar resultados al hacer clic fuera
-        document.addEventListener('click', function (e) {
-            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                searchResults.innerHTML = '';
-            }
-        });
-
         document.getElementById('garageSelect').addEventListener('change', function () {
             const capGarageInput = document.getElementById('capGarageInput');
             if (this.value === 'si') {
@@ -291,7 +193,29 @@
             }
         });
 
-        let form = document.getElementById('nuevoInmuebleForm');
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('editarInmuebleForm');
+            const guardarBtn = document.getElementById('guardarBtn');
+            const originalData = new FormData(form);
+
+            function checkForChanges() {
+                const currentData = new FormData(form);
+                let isChanged = false;
+
+                for (let [key, value] of currentData.entries()) {
+                    if (originalData.get(key) !== value) {
+                        isChanged = true;
+                        break;
+                    }
+                }
+
+                guardarBtn.disabled = !isChanged;
+            }
+
+            form.addEventListener('input', checkForChanges);
+            form.addEventListener('change', checkForChanges);
+        });
+
         let confirmModal = document.getElementById('confirmModal');
 
         function confirmSave() {
@@ -305,8 +229,7 @@
 
         function submitForm() {
             confirmModal.style.display = 'none';
-            form.submit(); // Envía el formulario después de confirmar
+            document.getElementById('editarInmuebleForm').submit(); // Envía el formulario después de confirmar
         }
-
     </script>
 }
