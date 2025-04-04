@@ -143,13 +143,13 @@ public class HomeController : Controller
 
     public IActionResult Clientes()
     {
-        var clientes = _context.Clientes.ToList(); // Recupera todos los clientes de la BD
+        var clientes = _context.Clientes.ToList(); // Recupera todos los clientes de la base de datos
         return View(clientes); // Envía la lista de clientes a la vista
     }
 
     public IActionResult Propietarios()
     {
-        var propietarios = _context.Propietarios.ToList(); // Recupera todos los propietarios de la BD
+        var propietarios = _context.Propietarios.Where(p => p.Estado == true).ToList(); // Filtrar solo propietarios activos
         return View(propietarios);
     }
 
@@ -228,7 +228,7 @@ public class HomeController : Controller
             nombre = propietario.Nombre,
             apellido = propietario.Apellido,
             dni = propietario.DNI, // Cambiado de Dni a DNI
-            cuit = propietario.Cuit,
+            // cuit = propietario.CUIT, // Eliminar esta línea si no es necesaria
             telefono = propietario.Telefono,
             mail = propietario.Mail,
             domicilio = propietario.Domicilio,
@@ -281,6 +281,59 @@ public class HomeController : Controller
             .ToList();
 
         return Json(new { success = true, results = propietarios });
+    }
+
+    public IActionResult Contacto()
+    {
+        return View();
+    }
+
+    public IActionResult EditarCliente(int id)
+    {
+        var cliente = _context.Clientes.FirstOrDefault(c => c.Id == id); // Recupera el cliente por su ID
+        if (cliente == null)
+        {
+            return NotFound();
+        }
+        return View(cliente); // Envía el cliente a la vista
+    }
+
+    [HttpPost]
+    public IActionResult EditarCliente(Cliente cliente)
+    {
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                var clienteExistente = _context.Clientes.FirstOrDefault(c => c.Id == cliente.Id); // Cambiado IdCliente a Id
+                if (clienteExistente == null)
+                {
+                    TempData["Error"] = "El cliente no existe.";
+                    return RedirectToAction("Clientes");
+                }
+
+                // Actualizar los campos editables
+                clienteExistente.Nombre = cliente.Nombre;
+                clienteExistente.Apellido = cliente.Apellido;
+                clienteExistente.DNI = cliente.DNI;
+                clienteExistente.Email = cliente.Email; 
+                clienteExistente.Telefono = cliente.Telefono;
+                clienteExistente.Domicilio = cliente.Domicilio;
+                clienteExistente.Localidad = cliente.Localidad;
+                clienteExistente.Provincia = cliente.Provincia;
+
+                _context.SaveChanges();
+                TempData["Mensaje"] = "Cliente actualizado exitosamente"; // Mensaje consistente con propietarios
+                return RedirectToAction("Clientes");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Error al actualizar el cliente: " + ex.Message);
+            }
+        }
+
+        TempData["Error"] = "Error de validación: " + string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+        return View(cliente);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

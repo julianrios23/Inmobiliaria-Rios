@@ -3,7 +3,17 @@
 @{
     ViewData["Title"] = "Editar Propietario";
 }
-
+<style>
+    .text-primary {
+        font-family: 'Playfair Display', serif;
+        color: #333333 !important;
+        font-size: 3rem;
+        font-weight: bold;
+        text-align: center; 
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+</style>
 <h1 class="text-primary">Editar Propietario</h1>
 
 @if (TempData["Mensaje"] != null)
@@ -19,17 +29,17 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="Nombre">Nombre</label>
-                <input asp-for="Nombre" class="form-control" required />
+                <input asp-for="Nombre" class="form-control" disabled /> <!-- Campo deshabilitado -->
                 <span asp-validation-for="Nombre" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label for="Apellido">Apellido</label>
-                <input asp-for="Apellido" class="form-control" required />
+                <input asp-for="Apellido" class="form-control" disabled /> <!-- Campo deshabilitado -->
                 <span asp-validation-for="Apellido" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label for="DNI">DNI</label>
-                <input asp-for="DNI" class="form-control" required />
+                <input asp-for="DNI" class="form-control" disabled /> <!-- Campo deshabilitado -->
                 <span asp-validation-for="DNI" class="text-danger"></span>
             </div>
             <div class="form-group">

@@ -1,0 +1,42 @@
+@{
+    ViewData["Title"] = "Contacto";
+}
+
+<h1>Contacto</h1>
+
+<div class="row">
+    <div class="col-md-6 border p-3 rounded">
+        <h2>Desarrollado by Julian Rios</h2>
+        <p>Comuniquese al +54 3777 574244</p>
+        <div class="mt-3 d-flex flex-column">
+            <a href="https://www.instagram.com/julian.rios.ok/" target="_blank" class="mb-3 text-danger">
+                <i class="bi bi-instagram" style="font-size: 2rem;"></i>
+            </a>
+            <a href="https://www.facebook.com/Julian.Rios.ok" target="_blank" class="mb-3 text-primary">
+                <i class="bi bi-facebook" style="font-size: 2rem;"></i>
+            </a>
+            <a href="https://www.linkedin.com/in/julian-rios-1809a2266/" target="_blank" class="text-info">
+                <i class="bi bi-linkedin" style="font-size: 2rem;"></i>
+            </a>
+        <p>Universidad De La Punta</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <p>Por favor, complete el formulario para ponerse en contacto con nosotros.</p>
+        <form class="border p-3 rounded">
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="nombre" placeholder="Ingrese su nombre">
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Correo Electrónico</label>
+                <input type="email" class="form-control" id="email" placeholder="Ingrese su correo electrónico">
+            </div>
+            <div class="mb-3">
+                <label for="mensaje" class="form-label">Mensaje</label>
+                <textarea class="form-control" id="mensaje" rows="4" placeholder="Escriba su mensaje"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Enviar</button>
+        </form>
+    </div>
+</div>
