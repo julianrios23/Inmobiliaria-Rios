@@ -1,0 +1,156 @@
+@model Inmobiliaria_Rios.Models.Cliente
+
+@{
+    ViewData["Title"] = "Editar Cliente";
+}
+<style>
+    .text-primary {
+        font-family: 'Playfair Display', serif;
+        color: #333333 !important;
+        font-size: 3rem;
+        font-weight: bold;
+        text-align: center; 
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+</style>
+<h1 class="text-primary">Editar Cliente</h1>
+
+<div class="text-center page-title-container">
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-success show custom-alert" role="alert" id="alertaMensaje">
+            @TempData["Mensaje"]
+        </div>
+    }
+</div>
+
+<form asp-action="EditarCliente" method="post" id="editarClienteForm" onsubmit="return confirmSave()">
+    <input type="hidden" asp-for="Id" />
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Nombre">Nombre</label>
+                <input asp-for="Nombre" class="form-control" disabled />
+                <input type="hidden" asp-for="Nombre" /> <!-- Campo oculto para conservar el valor -->
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Apellido">Apellido</label>
+                <input asp-for="Apellido" class="form-control" disabled />
+                <input type="hidden" asp-for="Apellido" /> <!-- Campo oculto para conservar el valor -->
+                <span asp-validation-for="Apellido" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="DNI">DNI</label>
+                <input asp-for="DNI" class="form-control" disabled />
+                <input type="hidden" asp-for="DNI" /> <!-- Campo oculto para conservar el valor -->
+                <span asp-validation-for="DNI" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Telefono">Teléfono</label>
+                <input asp-for="Telefono" class="form-control" />
+                <span asp-validation-for="Telefono" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="Email">Email</label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Domicilio">Domicilio</label>
+                <input asp-for="Domicilio" class="form-control" />
+                <span asp-validation-for="Domicilio" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Localidad">Localidad</label>
+                <input asp-for="Localidad" class="form-control" />
+                <span asp-validation-for="Localidad" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="Provincia">Provincia</label>
+                <input asp-for="Provincia" class="form-control" />
+                <span asp-validation-for="Provincia" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-3">
+        <button type="submit" class="btn btn-primary" id="guardarBtn" disabled>
+            <i class="bi bi-save me-2"></i>Guardar
+        </button>
+        <a href="@Url.Action("Clientes", "Home")" class="btn btn-secondary">
+            <i class="bi bi-x-circle me-2"></i>Cancelar
+        </a>
+    </div>
+</form>
+
+<div id="confirmModal" class="modal" tabindex="-1" style="display: none;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmación</h5>
+                <button type="button" class="btn-close" onclick="closeModal()"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de que desea guardar los cambios?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="submitForm()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        let form = document.getElementById('editarClienteForm');
+        let confirmModal = document.getElementById('confirmModal');
+
+        function confirmSave() {
+            confirmModal.style.display = 'block';
+            return false; // Evita el envío del formulario hasta que se confirme
+        }
+
+        function closeModal() {
+            confirmModal.style.display = 'none';
+        }
+
+        function submitForm() {
+            confirmModal.style.display = 'none';
+            form.submit(); // Envía el formulario después de confirmar
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            let alerta = document.getElementById('alertaMensaje');
+            if (alerta) {
+                setTimeout(function () {
+                    alerta.style.display = 'none';
+                }, 3000); // Ocultar alerta después de 3 segundos
+            }
+
+            const guardarBtn = document.getElementById('guardarBtn');
+            const originalData = new FormData(form);
+
+            function checkForChanges() {
+                const currentData = new FormData(form);
+                let isChanged = false;
+
+                for (let [key, value] of currentData.entries()) {
+                    if (originalData.get(key) !== value) {
+                        isChanged = true;
+                        break;
+                    }
+                }
+
+                guardarBtn.disabled = !isChanged;
+            }
+
+            form.addEventListener('input', checkForChanges);
+            form.addEventListener('change', checkForChanges);
+        });
+    </script>
+}

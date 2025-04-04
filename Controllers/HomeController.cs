@@ -13,12 +13,12 @@ public class HomeController : Controller
 
     public HomeController(ApplicationDbContextAlias context)
     {
-        _context = context;
+        _context = context; // Verifique que el contexto esté correctamente inyectado
     }
 
     public IActionResult Index()
     {
-        var propiedades = _context.Propiedades.ToList();
+        var propiedades = _context.Propiedades.ToList(); // Asegúrese de que la tabla 'Propiedades' exista en la base de datos
         return View(propiedades);
     }
 
@@ -30,7 +30,7 @@ public class HomeController : Controller
     public IActionResult Propiedades()
     {
         var propiedades = _context.Propiedades
-            .Include(p => p.Propietario) // Asegúrate de incluir la relación con Propietario
+            .Include(p => p.Propietario) // Verifique que la relación 'Propietario' esté configurada en el modelo
             .Where(p => p.Estado) // Filtra solo las propiedades activas
             .ToList();
 
@@ -143,13 +143,16 @@ public class HomeController : Controller
 
     public IActionResult Clientes()
     {
-        var clientes = _context.Clientes.ToList(); // Recupera todos los clientes de la base de datos
+        var clientes = _context.Clientes.ToList(); // Verifique que la tabla 'Clientes' exista en la base de datos
         return View(clientes); // Envía la lista de clientes a la vista
     }
 
     public IActionResult Propietarios()
     {
-        var propietarios = _context.Propietarios.Where(p => p.Estado == true).ToList(); // Filtrar solo propietarios activos
+        var propietarios = _context.Propietarios
+            .Where(p => p.Estado == true) // Filtrar solo propietarios activos
+            .ToList();
+
         return View(propietarios);
     }
 
