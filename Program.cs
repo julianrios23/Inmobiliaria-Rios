@@ -35,8 +35,9 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+// Reemplazar UseEndpoints con MapControllerRoute
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}"); // Configurar Login como la vista inicial
 
 app.Run();

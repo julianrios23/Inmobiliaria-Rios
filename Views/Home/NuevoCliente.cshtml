@@ -34,9 +34,9 @@
                 <span asp-validation-for="DNI" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label for="Mail">Mail</label>
-                <input asp-for="Mail" class="form-control" required />
-                <span asp-validation-for="Mail" class="text-danger"></span>
+                <label asp-for="Email" class="form-label">Email</label> <!-- Cambiado de Mail a Email -->
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
             </div>
         </div>
         <div class="col-md-6">

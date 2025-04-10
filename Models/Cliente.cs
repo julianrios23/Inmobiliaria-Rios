@@ -20,7 +20,7 @@ namespace Inmobiliaria_Rios.Models
         public long DNI { get; set; } // Cambiado de int a long
 
         [Column("mail")] // Mapea la columna mail
-        public string Email { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty; // Asegurarse de que la propiedad esté definida correctamente
 
         [Column("telefono")] // Mapea la columna telefono
         public long Telefono { get; set; } // Cambiado de int a long

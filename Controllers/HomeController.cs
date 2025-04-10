@@ -18,8 +18,7 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        var propiedades = _context.Propiedades.ToList(); // Asegúrese de que la tabla 'Propiedades' exista en la base de datos
-        return View(propiedades);
+        return View(); // Restaurar para que cargue la vista Index
     }
 
     public IActionResult Privacy()
