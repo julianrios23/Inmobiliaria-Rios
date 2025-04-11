@@ -53,7 +53,7 @@
             </div>
         }
 
-        <form asp-controller="Home" asp-action="GuardarInmueble" method="post" class="row g-3 needs-validation" id="nuevoInmuebleForm" onsubmit="return confirmSave()">
+        <form asp-controller="Home" asp-action="GuardarInmueble" method="post" enctype="multipart/form-data" class="row g-3 needs-validation" id="nuevoInmuebleForm" onsubmit="return confirmSave()">
             <div class="col-md-6">
                 <label class="form-label">Buscar Propietario <span class="text-danger">*</span></label>
                 <div class="input-group">
@@ -181,6 +181,11 @@
                 <input asp-for="Precio" type="number" class="form-control" required min="0" />
             </div>
 
+            <div class="col-md-4">
+                <label class="form-label">Cargar Imágenes</label>
+                <input type="file" name="imagenes" class="form-control" multiple accept="image/*" />
+            </div>
+
             <div class="col-md-12">
                 <label asp-for="Observaciones" class="form-label">Observaciones</label>
                 <textarea asp-for="Observaciones" class="form-control" rows="3"></textarea>
@@ -220,7 +225,7 @@
     @await Html.PartialAsync("_ValidationScriptsPartial")
 
     <script>
-        // ...existing validation code...
+        
 
         const searchInput = document.getElementById('searchPropietario');
         const searchResults = document.getElementById('searchResults');
@@ -287,7 +292,7 @@
                 capGarageInput.disabled = false;
             } else {
                 capGarageInput.disabled = true;
-                capGarageInput.value = ''; // Limpiar el valor si se deshabilita
+                capGarageInput.value = ''; 
             }
         });
 
@@ -296,7 +301,7 @@
 
         function confirmSave() {
             confirmModal.style.display = 'block';
-            return false; // Evita el envío del formulario hasta que se confirme
+            return false;
         }
 
         function closeModal() {
@@ -305,7 +310,7 @@
 
         function submitForm() {
             confirmModal.style.display = 'none';
-            form.submit(); // Envía el formulario después de confirmar
+            form.submit(); 
         }
 
     </script>

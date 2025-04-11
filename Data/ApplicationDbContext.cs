@@ -13,6 +13,7 @@ namespace Inmobiliaria_Rios.Data
         public DbSet<Propiedad> Propiedades { get; set; }
         public DbSet<Propietario> Propietarios { get; set; }
         public DbSet<Cliente> Clientes { get; set; } // Agregado para la tabla clientes
+        public DbSet<ImagenInmueble> ImagenesInmuebles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Generic;
 
 namespace Inmobiliaria_Rios.Models
 {
@@ -70,5 +71,7 @@ namespace Inmobiliaria_Rios.Models
 
         [Column("estado")]
         public bool Estado { get; set; } = true;
+
+        public ICollection<ImagenInmueble> Imagenes { get; set; } = new List<ImagenInmueble>(); // Relación con las imágenes
     }
 }

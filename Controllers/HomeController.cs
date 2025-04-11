@@ -4,16 +4,21 @@ using Inmobiliaria_Rios.Models;
 using ApplicationDbContextAlias = Inmobiliaria_Rios.Data.ApplicationDbContext;  // Alias para resolver la ambigüedad
 using Microsoft.EntityFrameworkCore; // Importación necesaria para Include
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using Microsoft.AspNetCore.Antiforgery; // Importar el espacio de nombres necesario
 
 namespace Inmobiliaria_Rios.Controllers;
 
 public class HomeController : Controller
 {
     private readonly ApplicationDbContextAlias _context;
+    private readonly IAntiforgery _antiforgery; // Inyectar el servicio de antifalsificación
 
-    public HomeController(ApplicationDbContextAlias context)
+    public HomeController(ApplicationDbContextAlias context, IAntiforgery antiforgery)
     {
-        _context = context; // Verifique que el contexto esté correctamente inyectado
+        _context = context;
+        _antiforgery = antiforgery; // Asignar el servicio inyectado
     }
 
     public IActionResult Index()
@@ -64,7 +69,7 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public IActionResult GuardarInmueble(Propiedad propiedad)
+    public IActionResult GuardarInmueble(Propiedad propiedad, List<IFormFile> imagenes)
     {
         if (propiedad.IdPropietario == 0)
         {
@@ -82,6 +87,33 @@ public class HomeController : Controller
             propiedad.Estado = true;
             _context.Propiedades.Add(propiedad);
             _context.SaveChanges();
+
+            if (imagenes != null && imagenes.Count > 0)
+            {
+                string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "imagenes");
+                foreach (var imagen in imagenes)
+                {
+                    if (imagen.Length > 0)
+                    {
+                        string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imagen.FileName);
+                        string filePath = Path.Combine(uploadPath, fileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            imagen.CopyTo(stream);
+                        }
+
+                        var imagenInmueble = new ImagenInmueble
+                        {
+                            IdInmueble = propiedad.Id,
+                            Ruta = Path.Combine("imagenes", fileName) // Usar `Ruta` en lugar de `RutaImagen`
+                        };
+                        _context.ImagenesInmuebles.Add(imagenInmueble); // Asegurarse de que DbSet<ImagenInmueble> esté configurado correctamente
+                    }
+                }
+                _context.SaveChanges();
+            }
+
             TempData["Mensaje"] = "Propiedad guardada exitosamente";
             return RedirectToAction("Propiedades");
         }
@@ -92,10 +124,69 @@ public class HomeController : Controller
         }
     }
 
+    [HttpPost]
+    public IActionResult CargarImagen(int id, IFormFile nuevaImagen)
+    {
+        if (nuevaImagen != null && nuevaImagen.Length > 0)
+        {
+            var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "imagenes", "propiedades");
+            if (!Directory.Exists(rutaCarpeta))
+            {
+                Directory.CreateDirectory(rutaCarpeta);
+            }
+
+            var nombreArchivo = $"{id}_{Path.GetRandomFileName()}{Path.GetExtension(nuevaImagen.FileName)}";
+            var rutaCompleta = Path.Combine(rutaCarpeta, nombreArchivo);
+
+            using (var stream = new FileStream(rutaCompleta, FileMode.Create))
+            {
+                nuevaImagen.CopyTo(stream);
+            }
+
+            // Guardar la ruta de la imagen en la base de datos
+            // Ejemplo: _context.Imagenes.Add(new Imagen { PropiedadId = id, Ruta = $"/imagenes/propiedades/{nombreArchivo}" });
+            // _context.SaveChanges();
+
+            TempData["Success"] = "Imagen cargada correctamente.";
+        }
+        else
+        {
+            TempData["Error"] = "No se pudo cargar la imagen. Intente nuevamente.";
+        }
+
+        return RedirectToAction("EditarInmueble", new { id });
+    }
+
+    [HttpDelete]
+    public IActionResult EliminarImagen(int id)
+    {
+        // Buscar la imagen en la base de datos usando `IdImagen`
+        var imagen = _context.ImagenesInmuebles.FirstOrDefault(i => i.IdImagen == id);
+
+        if (imagen != null)
+        {
+            var rutaCompleta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imagen.Ruta.TrimStart('/')); // Usar `Ruta` en lugar de `RutaImagen`
+            if (System.IO.File.Exists(rutaCompleta))
+            {
+                System.IO.File.Delete(rutaCompleta);
+            }
+
+            // Eliminar la imagen de la base de datos
+            _context.ImagenesInmuebles.Remove(imagen);
+            _context.SaveChanges();
+
+            return Ok(new { success = true });
+        }
+
+        return BadRequest(new { success = false, message = "No se pudo eliminar la imagen." });
+    }
+
+    [HttpGet]
     public IActionResult EditarInmueble(int id)
     {
         var propiedad = _context.Propiedades
             .Include(p => p.Propietario) // Incluir datos del propietario
+            .Include(p => p.Imagenes) // Incluir imágenes relacionadas
             .FirstOrDefault(p => p.Id == id);
 
         if (propiedad == null)
@@ -103,18 +194,20 @@ public class HomeController : Controller
             return NotFound();
         }
 
+        // Asegurarse de que el propietario correcto esté disponible en ViewBag
         ViewBag.Propietarios = _context.Propietarios.Where(p => p.Estado).ToList();
+
         return View(propiedad); // Enviar toda la información de la propiedad al modelo
     }
 
     [HttpPost]
-    public IActionResult EditarInmueble(Propiedad propiedad)
+    public IActionResult EditarInmueble(Propiedad propiedad, List<IFormFile> nuevasImagenes)
     {
         if (ModelState.IsValid)
         {
             try
             {
-                var propiedadExistente = _context.Propiedades.FirstOrDefault(p => p.Id == propiedad.Id);
+                var propiedadExistente = _context.Propiedades.Include(p => p.Imagenes).FirstOrDefault(p => p.Id == propiedad.Id);
                 if (propiedadExistente == null)
                 {
                     TempData["Error"] = "La propiedad no existe.";
@@ -125,6 +218,38 @@ public class HomeController : Controller
                 propiedadExistente.Precio = propiedad.Precio;
                 propiedadExistente.Opcion = propiedad.Opcion;
                 propiedadExistente.Observaciones = propiedad.Observaciones;
+
+                // Manejar nuevas imágenes
+                if (nuevasImagenes != null && nuevasImagenes.Count > 0)
+                {
+                    string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "imagenes");
+                    if (!Directory.Exists(uploadPath))
+                    {
+                        Directory.CreateDirectory(uploadPath);
+                    }
+
+                    foreach (var imagen in nuevasImagenes)
+                    {
+                        if (imagen.Length > 0)
+                        {
+                            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imagen.FileName);
+                            string filePath = Path.Combine(uploadPath, fileName);
+
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                imagen.CopyTo(stream);
+                            }
+
+                            // Crear la nueva imagen y guardarla en la base de datos
+                            var nuevaImagen = new ImagenInmueble
+                            {
+                                IdInmueble = propiedad.Id, // Relacionar con la propiedad
+                                Ruta = Path.Combine("imagenes", fileName) // Usar `Ruta` en lugar de `RutaImagen`
+                            };
+                            _context.ImagenesInmuebles.Add(nuevaImagen); // Guardar en la tabla `imagenes`
+                        }
+                    }
+                }
 
                 _context.SaveChanges();
                 TempData["Mensaje"] = "Propiedad actualizada exitosamente.";
@@ -336,6 +461,22 @@ public class HomeController : Controller
 
         TempData["Error"] = "Error de validación: " + string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
         return View(cliente);
+    }
+
+    [HttpGet]
+    public IActionResult ObtenerImagenes(int idInmueble)
+    {
+        var imagenes = _context.ImagenesInmuebles
+            .Where(i => i.IdInmueble == idInmueble)
+            .Select(i => i.Ruta)
+            .ToList();
+
+        if (!imagenes.Any())
+        {
+            return Json(new { success = false, message = "No hay imágenes disponibles para este inmueble." });
+        }
+
+        return Json(new { success = true, imagenes });
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -4,7 +4,7 @@
     ViewData["Title"] = "Editar Inmueble";
 }
 
-<div class="form-container">
+<div class="form-container" style="overflow-y: auto; max-height: 80vh;">
     <div class="container">
         <h1 class="display-4-text-primary mb-4">Editar Inmueble</h1>
 
@@ -17,20 +17,23 @@
             </div>
         }
 
+        @if (Model.Imagenes == null || !Model.Imagenes.Any())
+        {
+            <div class="alert alert-info mb-3" role="alert">
+                <i class="bi bi-info-circle me-2"></i> No hay imágenes cargadas para esta propiedad.
+            </div>
+        }
+
         <form asp-controller="Home" asp-action="EditarInmueble" method="post" class="row g-3 needs-validation" novalidate id="editarInmuebleForm" onsubmit="return confirmSave()">
             <input type="hidden" asp-for="Id" />
+            @Html.AntiForgeryToken()
             <div class="col-md-6">
                 <label class="form-label">Propietario</label>
-                <select asp-for="IdPropietario" class="form-select" disabled>
-                    <option value="">Seleccione un propietario...</option>
-                    @foreach (var propietario in ViewBag.Propietarios)
-                    {
-                        <option value="@propietario.Id" selected="@propietario.Id == Model.IdPropietario">
-                            @($"{propietario.Nombre} {propietario.Apellido}")
-                        </option>
-                    }
-                </select>
-                <span asp-validation-for="IdPropietario" class="text-danger"></span>
+                @{
+                    var propietarios = (List<Inmobiliaria_Rios.Models.Propietario>)ViewBag.Propietarios;
+                    var propietarioSeleccionado = propietarios.FirstOrDefault(p => p.Id == Model.IdPropietario);
+                }
+                <input type="text" class="form-control" value="@($"{propietarioSeleccionado?.Nombre} {propietarioSeleccionado?.Apellido}")" readonly />
             </div>
 
             <div class="col-md-6">
@@ -145,13 +148,46 @@
                 <input asp-for="Precio" type="number" class="form-control" required min="0" />
             </div>
 
+            <div class="col-md-4">
+                <label for="nuevasImagenes" class="form-label">Cargar nuevas imágenes</label>
+                <input type="file" class="form-control" id="nuevasImagenes" name="nuevasImagenes" accept="image/*" multiple>
+            </div>
+
             <div class="col-md-12">
                 <label asp-for="Observaciones" class="form-label">Observaciones</label>
                 <textarea asp-for="Observaciones" class="form-control" rows="3"></textarea>
             </div>
 
+            <div class="col-md-12">
+                <label class="form-label">Imágenes</label>
+                <div class="mb-3">
+                    @if (Model.Imagenes != null && Model.Imagenes.Any())
+                    {
+                        <div class="row">
+                            @foreach (var imagen in Model.Imagenes)
+                            {
+                                <div class="col-md-3">
+                                    <div class="card">
+                                        <img src="@Url.Content($"~/{imagen.Ruta}")" class="card-img-top img-thumbnail" alt="Imagen de la propiedad" style="max-height: 150px; object-fit: cover;">
+                                        <div class="card-body text-center">
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarImagen(@imagen.IdImagen)">
+                                                <i class="bi bi-trash"></i> Eliminar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p>No hay imágenes cargadas para esta propiedad.</p>
+                    }
+                </div>
+            </div>
+
             <div class="col-12 text-center mt-4">
-                <button type="submit" class="btn btn-success me-2" id="guardarBtn" disabled>
+                <button type="submit" class="btn btn-success me-2" id="guardarBtn">
                     <i class="bi bi-save"></i> Guardar
                 </button>
                 <a href="@Url.Action("Propiedades", "Home")" class="btn btn-secondary">
@@ -230,6 +266,27 @@
         function submitForm() {
             confirmModal.style.display = 'none';
             document.getElementById('editarInmuebleForm').submit(); // Envía el formulario después de confirmar
+        }
+
+        function eliminarImagen(imagenId) {
+            if (confirm("¿Está seguro de que desea eliminar esta imagen?")) {
+                // Realizar una solicitud para eliminar la imagen
+                fetch(`/Home/EliminarImagen/${imagenId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]').value // Usar el token generado
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload(); // Recargar la página para reflejar los cambios
+                    } else {
+                        alert("No se pudo eliminar la imagen. Intente nuevamente.");
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
         }
     </script>
 }

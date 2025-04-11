@@ -90,29 +90,30 @@ LOCK TABLES `contrato` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `imagenes_inmuebles`
+-- Table structure for table `imagenes`
 --
 
-DROP TABLE IF EXISTS `imagenes_inmuebles`;
+DROP TABLE IF EXISTS `imagenes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `imagenes_inmuebles` (
+CREATE TABLE `imagenes` (
   `idimagen` int NOT NULL AUTO_INCREMENT,
   `idinmueble` int NOT NULL,
   `ruta_imagen` varchar(255) NOT NULL,
   PRIMARY KEY (`idimagen`),
   KEY `idinmueble` (`idinmueble`),
-  CONSTRAINT `imagenes_inmuebles_ibfk_1` FOREIGN KEY (`idinmueble`) REFERENCES `inmuebles` (`idinmuebles`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  CONSTRAINT `imagenes_ibfk_1` FOREIGN KEY (`idinmueble`) REFERENCES `inmuebles` (`idinmuebles`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `imagenes_inmuebles`
+-- Dumping data for table `imagenes`
 --
 
-LOCK TABLES `imagenes_inmuebles` WRITE;
-/*!40000 ALTER TABLE `imagenes_inmuebles` DISABLE KEYS */;
-/*!40000 ALTER TABLE `imagenes_inmuebles` ENABLE KEYS */;
+LOCK TABLES `imagenes` WRITE;
+/*!40000 ALTER TABLE `imagenes` DISABLE KEYS */;
+INSERT INTO `imagenes` VALUES (1,13,'imagenes\\30556c27-9fff-4a67-a88b-3ef60df3f85e.jpg'),(2,13,'imagenes\\68c5f015-3c5c-484d-9df1-03478f4895c6.jpg'),(3,14,'imagenes\\1b253ca8-cfa8-4261-a930-338e7a370643.jpg'),(4,14,'imagenes\\273ee255-e4aa-44f2-9941-e1477e64a149.jpg'),(5,14,'imagenes\\72c8af04-580b-4af3-b6a8-9a0f925f0d33.jpg'),(6,14,'imagenes\\626f362a-a59c-4c15-8196-44652d268f1b.jpg');
+/*!40000 ALTER TABLE `imagenes` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -146,7 +147,7 @@ CREATE TABLE `inmuebles` (
   PRIMARY KEY (`idinmuebles`),
   KEY `idpropietario_idx` (`idpropietario`),
   CONSTRAINT `idpropietario` FOREIGN KEY (`idpropietario`) REFERENCES `propietarios` (`idpropietario`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -155,7 +156,7 @@ CREATE TABLE `inmuebles` (
 
 LOCK TABLES `inmuebles` WRITE;
 /*!40000 ALTER TABLE `inmuebles` DISABLE KEYS */;
-INSERT INTO `inmuebles` VALUES (2,1,'Av San Martin 1586','Villa Mercedes','San Luis','departamento',3,1,'si',NULL,'no','no','si',1,'si','no','alquiler',450000,'A metros de plaza principal',0),(5,2,'Av Sarmiento 955','San Luis','San Luis','local',1,1,'si',2,'no','no','no',1,'no','no','alquiler',650000,'Local centrico con amplia vidriera y cortina metalica',1),(6,2,'Carlos Gardel 987','Rio Cuarto','Cordoba','local',1,1,'no',NULL,'no','no','no',1,'no','no','alquiler',400000,'Amplio local de 96 m2 con vidriera y cortina metalica',1),(7,1,'Belgrano 1944','La Punta','San Luis','casa',4,2,'si',1,'si','no','no',1,'si','si','venta',80000000,'Casa restaurada con mejoras funcionales.',1),(8,1,'San Lorenzo 301','Merlo','San Luis','local',2,1,'no',NULL,'no','no','no',1,'si','no','alquiler',552000,'Local en esquina tradicional. Ideal Artesanias',1),(9,9,'Las Moras 1101','La Punta','San Luis','casa',3,1,'no',NULL,'si','no','no',1,'si','si','alquiler',490000,'linda',1),(10,11,'Francia 5600','Juana Koslay','San Luis','departamento',2,1,'no',NULL,'no','no','si',1,'si','no','alquiler',290000,'Iluminado',1),(11,6,'Triunvurato 1955','La Punta','San Luis','departamento',3,1,'si',1,'no','no','si',1,'si','no','alquiler',430000,'muy lindo...',1),(12,10,'Coronel Pringles 1620','San Luis','San Luis','local',2,1,'no',NULL,'no','no','no',2,'si','no','alquiler',812000,'Local con vidriera amplia con deposito en 1er piso. 200 m2.....',1);
+INSERT INTO `inmuebles` VALUES (13,12,'Las Piedras 963','La Punta','San Luis','local',1,1,'no',NULL,'no','no','no',1,'si','no','alquiler',460000,'Local luminoso de 120 m2 ideal para local ropa',1),(14,9,'Las Moras 1101','Villa Mercedes','San Luis','casa',4,2,'si',1,'si','no','no',1,'si','si','venta',50000000,'Vivienda de 10 x 25. 162 m2 de construccion',1);
 /*!40000 ALTER TABLE `inmuebles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -267,4 +268,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-10 12:07:18
+-- Dump completed on 2025-04-11  8:46:37
