@@ -232,7 +232,17 @@ public class HomeController : Controller
                     {
                         if (imagen.Length > 0)
                         {
-                            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imagen.FileName);
+                            // Validar tipo de archivo
+                            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                            var extension = Path.GetExtension(imagen.FileName).ToLower();
+                            if (!allowedExtensions.Contains(extension))
+                            {
+                                TempData["Error"] = "Formato de archivo no permitido.";
+                                continue;
+                            }
+
+                            // Guardar archivo
+                            string fileName = Guid.NewGuid().ToString() + extension;
                             string filePath = Path.Combine(uploadPath, fileName);
 
                             using (var stream = new FileStream(filePath, FileMode.Create))
@@ -246,7 +256,7 @@ public class HomeController : Controller
                                 IdInmueble = propiedad.Id, // Relacionar con la propiedad
                                 Ruta = Path.Combine("imagenes", fileName) // Usar `Ruta` en lugar de `RutaImagen`
                             };
-                            _context.ImagenesInmuebles.Add(nuevaImagen); // Guardar en la tabla `imagenes`
+                            _context.ImagenesInmuebles.Add(nuevaImagen);
                         }
                     }
                 }

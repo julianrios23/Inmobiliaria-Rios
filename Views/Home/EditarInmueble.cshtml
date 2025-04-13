@@ -24,7 +24,7 @@
             </div>
         }
 
-        <form asp-controller="Home" asp-action="EditarInmueble" method="post" class="row g-3 needs-validation" novalidate id="editarInmuebleForm" onsubmit="return confirmSave()">
+        <form asp-controller="Home" asp-action="EditarInmueble" method="post" class="row g-3 needs-validation" novalidate id="editarInmuebleForm" onsubmit="return confirmSave()" enctype="multipart/form-data">
             <input type="hidden" asp-for="Id" />
             @Html.AntiForgeryToken()
             <div class="col-md-6">
@@ -269,7 +269,16 @@
         }
 
         function eliminarImagen(imagenId) {
-            if (confirm("¿Está seguro de que desea eliminar esta imagen?")) {
+            const confirmModal = document.getElementById('confirmModal');
+            const modalTitle = confirmModal.querySelector('.modal-title');
+            const modalBody = confirmModal.querySelector('.modal-body p');
+            const confirmButton = confirmModal.querySelector('.modal-footer .btn-primary');
+
+            modalTitle.textContent = "Confirmación de eliminación";
+            modalBody.textContent = "¿Está seguro de que desea eliminar esta imagen?";
+            confirmButton.textContent = "Eliminar";
+            confirmButton.onclick = function () {
+                confirmModal.style.display = 'none';
                 // Realizar una solicitud para eliminar la imagen
                 fetch(`/Home/EliminarImagen/${imagenId}`, {
                     method: 'DELETE',
@@ -286,7 +295,9 @@
                     }
                 })
                 .catch(error => console.error('Error:', error));
-            }
+            };
+
+            confirmModal.style.display = 'block';
         }
     </script>
 }
