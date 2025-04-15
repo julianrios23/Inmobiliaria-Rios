@@ -50,43 +50,46 @@ INSERT INTO `clientes` VALUES (4,'María','Gómez',27894561,'maria.gomez@email.c
 UNLOCK TABLES;
 
 --
--- Table structure for table `contrato`
+-- Table structure for table `contratos`
 --
 
-DROP TABLE IF EXISTS `contrato`;
+DROP TABLE IF EXISTS `contratos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `contrato` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `inmueble_id` int NOT NULL,
-  `inquilino_id` int NOT NULL,
-  `fecha_inicio` date NOT NULL,
-  `fecha_fin` date NOT NULL,
-  `monto_mensual` decimal(10,2) NOT NULL,
-  `fecha_cancelacion_anticipada` date DEFAULT NULL,
-  `multa` decimal(10,2) DEFAULT NULL,
-  `creado_por_usuario_id` int NOT NULL,
-  `cancelado_por_usuario_id` int DEFAULT NULL,
-  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `inmueble_id` (`inmueble_id`),
-  KEY `inquilino_id` (`inquilino_id`),
-  KEY `creado_por_usuario_id` (`creado_por_usuario_id`),
-  KEY `cancelado_por_usuario_id` (`cancelado_por_usuario_id`),
-  CONSTRAINT `contrato_ibfk_1` FOREIGN KEY (`inmueble_id`) REFERENCES `inmuebles` (`idinmuebles`),
-  CONSTRAINT `contrato_ibfk_2` FOREIGN KEY (`inquilino_id`) REFERENCES `clientes` (`idclientes`),
-  CONSTRAINT `contrato_ibfk_3` FOREIGN KEY (`creado_por_usuario_id`) REFERENCES `usuarios` (`idusuarios`),
-  CONSTRAINT `contrato_ibfk_4` FOREIGN KEY (`cancelado_por_usuario_id`) REFERENCES `usuarios` (`idusuarios`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE `contratos` (
+  `Id` int NOT NULL AUTO_INCREMENT,
+  `idinmuebles` int NOT NULL,
+  `idclientes` int NOT NULL,
+  `FechaInicio` date NOT NULL,
+  `FechaFin` date NOT NULL,
+  `FechaFinAnticipada` date DEFAULT NULL,
+  `MontoMensual` decimal(18,2) NOT NULL,
+  `Multa` decimal(18,2) DEFAULT NULL,
+  `Estado` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `UsuarioCreacionId` int NOT NULL,
+  `FechaCreacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `UsuarioModificacionId` int DEFAULT NULL,
+  `FechaModificacion` datetime DEFAULT NULL,
+  PRIMARY KEY (`Id`),
+  KEY `fk_inmuebles` (`idinmuebles`),
+  KEY `fk_clientes` (`idclientes`),
+  KEY `fk_usuario_creacion` (`UsuarioCreacionId`),
+  KEY `fk_usuario_modificacion` (`UsuarioModificacionId`),
+  CONSTRAINT `fk_clientes` FOREIGN KEY (`idclientes`) REFERENCES `clientes` (`idclientes`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_inmuebles` FOREIGN KEY (`idinmuebles`) REFERENCES `inmuebles` (`idinmuebles`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_usuario_creacion` FOREIGN KEY (`UsuarioCreacionId`) REFERENCES `usuarios` (`idusuarios`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_usuario_modificacion` FOREIGN KEY (`UsuarioModificacionId`) REFERENCES `usuarios` (`idusuarios`) ON UPDATE CASCADE,
+  CONSTRAINT `chk_estado` CHECK ((`Estado` in (_utf8mb4'Vigente',_utf8mb4'Finalizado',_utf8mb4'Cancelado')))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `contrato`
+-- Dumping data for table `contratos`
 --
 
-LOCK TABLES `contrato` WRITE;
-/*!40000 ALTER TABLE `contrato` DISABLE KEYS */;
-/*!40000 ALTER TABLE `contrato` ENABLE KEYS */;
+LOCK TABLES `contratos` WRITE;
+/*!40000 ALTER TABLE `contratos` DISABLE KEYS */;
+/*!40000 ALTER TABLE `contratos` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -161,40 +164,42 @@ INSERT INTO `inmuebles` VALUES (13,12,'Las Piedras 963','La Punta','San Luis','l
 UNLOCK TABLES;
 
 --
--- Table structure for table `pago`
+-- Table structure for table `pagos`
 --
 
-DROP TABLE IF EXISTS `pago`;
+DROP TABLE IF EXISTS `pagos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `pago` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `contrato_id` int NOT NULL,
-  `numero_pago` int NOT NULL,
-  `fecha_pago` date NOT NULL,
-  `detalle` varchar(255) DEFAULT NULL,
-  `importe` decimal(10,2) NOT NULL,
-  `anulado` tinyint(1) NOT NULL DEFAULT '0',
-  `creado_por_usuario_id` int NOT NULL,
-  `anulado_por_usuario_id` int DEFAULT NULL,
-  `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `contrato_id` (`contrato_id`),
-  KEY `creado_por_usuario_id` (`creado_por_usuario_id`),
-  KEY `anulado_por_usuario_id` (`anulado_por_usuario_id`),
-  CONSTRAINT `pago_ibfk_1` FOREIGN KEY (`contrato_id`) REFERENCES `contrato` (`id`),
-  CONSTRAINT `pago_ibfk_2` FOREIGN KEY (`creado_por_usuario_id`) REFERENCES `usuarios` (`idusuarios`),
-  CONSTRAINT `pago_ibfk_3` FOREIGN KEY (`anulado_por_usuario_id`) REFERENCES `usuarios` (`idusuarios`)
+CREATE TABLE `pagos` (
+  `Id` int NOT NULL AUTO_INCREMENT,
+  `ContratoId` int NOT NULL,
+  `NumeroPago` int NOT NULL,
+  `FechaPago` date NOT NULL,
+  `Importe` decimal(18,2) NOT NULL,
+  `Concepto` varchar(100) NOT NULL,
+  `Estado` varchar(20) NOT NULL,
+  `UsuarioCreacionId` int NOT NULL,
+  `FechaCreacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `UsuarioAnulacionId` int DEFAULT NULL,
+  `FechaAnulacion` datetime DEFAULT NULL,
+  PRIMARY KEY (`Id`),
+  KEY `ContratoId` (`ContratoId`),
+  KEY `UsuarioCreacionId` (`UsuarioCreacionId`),
+  KEY `UsuarioAnulacionId` (`UsuarioAnulacionId`),
+  CONSTRAINT `pagos_ibfk_1` FOREIGN KEY (`ContratoId`) REFERENCES `contratos` (`Id`) ON DELETE CASCADE,
+  CONSTRAINT `pagos_ibfk_2` FOREIGN KEY (`UsuarioCreacionId`) REFERENCES `usuarios` (`idusuarios`),
+  CONSTRAINT `pagos_ibfk_3` FOREIGN KEY (`UsuarioAnulacionId`) REFERENCES `usuarios` (`idusuarios`),
+  CONSTRAINT `chk_estado_pago` CHECK ((`Estado` in (_utf8mb4'Pagado',_utf8mb4'Anulado')))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `pago`
+-- Dumping data for table `pagos`
 --
 
-LOCK TABLES `pago` WRITE;
-/*!40000 ALTER TABLE `pago` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pago` ENABLE KEYS */;
+LOCK TABLES `pagos` WRITE;
+/*!40000 ALTER TABLE `pagos` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pagos` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -268,4 +273,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-12 22:39:24
+-- Dump completed on 2025-04-14 21:23:11

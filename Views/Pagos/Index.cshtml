@@ -1,0 +1,33 @@
+@model IEnumerable<Inmobiliaria_Rios.Models.Pago>
+
+<h1>Pagos</h1>
+<a href="/Pagos/Create?contratoId=@ViewBag.ContratoId">Registrar Pago</a>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Número de Pago</th>
+            <th>Fecha Pago</th>
+            <th>Importe</th>
+            <th>Concepto</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pago in Model)
+        {
+            <tr>
+                <td>@pago.Id</td>
+                <td>@pago.NumeroPago</td>
+                <td>@pago.FechaPago.ToShortDateString()</td>
+                <td>@pago.Importe</td>
+                <td>@pago.Concepto</td>
+                <td>@pago.Estado</td>
+                <td>
+                    <a href="/Pagos/Delete/@pago.Id">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
