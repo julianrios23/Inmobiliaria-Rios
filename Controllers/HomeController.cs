@@ -489,6 +489,32 @@ public class HomeController : Controller
         return Json(new { success = true, imagenes });
     }
 
+    [HttpGet]
+    public IActionResult NuevoCliente()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public IActionResult NuevoCliente(Cliente cliente)
+    {
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                _context.Clientes.Add(cliente);
+                _context.SaveChanges();
+                TempData["Mensaje"] = "Cliente guardado exitosamente";
+                return RedirectToAction("Clientes");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Error al guardar el cliente: " + ex.Message);
+            }
+        }
+        return View(cliente);
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
