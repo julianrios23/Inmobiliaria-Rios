@@ -34,7 +34,7 @@ namespace Inmobiliaria_Rios.Models
         [Column("provincia")] // Mapea la columna provincia
         public string Provincia { get; set; } = string.Empty;
 
-        [Column("estado")] // Mapea la columna estado
-        public bool Estado { get; set; } // Cambiado de bool? a bool
+        [Column("estado")] 
+        public bool Estado { get; set; } = true; 
     }
 }

@@ -57,25 +57,109 @@
                 <th>Cliente</th>
                 <th>Fecha Inicio</th>
                 <th>Fecha Fin</th>
+                <th>Fecha Fin Anticipada</th>
                 <th>Monto Mensual</th>
+                <th>Multa</th>
                 <th>Estado</th>
+                <th>Usuario Creación</th>
+                <th>Fecha Creación</th>
+                <th>Usuario Modificación</th>
+                <th>Fecha Modificación</th>
             </tr>
         </thead>
         <tbody id="tableBody">
             @foreach (var contrato in Model)
             {
                 <tr class="align-middle" style="cursor: pointer;" onclick="window.location.href='@Url.Action("Edit", "Contratos", new { id = contrato.Id })'">
-                    <td>@contrato.IdInmuebles</td>
-                    <td>@contrato.IdClientes</td>
+                    @* IDs ocultos, no se muestran en la tabla *@
+                    @* <td style="display:none;">@contrato.Id</td> *@
+                    @* <td style="display:none;">@contrato.IdInmuebles</td> *@
+                    @* <td style="display:none;">@contrato.IdClientes</td> *@
+                    <td>
+                        @* Inmueble *@
+                        @{
+                            string descInmueble = contrato.IdInmuebles.ToString();
+                            if (ViewBag.Inmuebles != null)
+                            {
+                                var inmuebles = ViewBag.Inmuebles as IEnumerable<Inmobiliaria_Rios.Models.Propiedad>;
+                                var inmueble = inmuebles?.FirstOrDefault(i => i.Id == contrato.IdInmuebles);
+                                if (inmueble != null)
+                                {
+                                    descInmueble = inmueble.Direccion + " - " + inmueble.Localidad + " - " + inmueble.Provincia;
+                                }
+                            }
+                        }
+                        <span data-bs-toggle="tooltip" title="@descInmueble">
+                            @descInmueble
+                        </span>
+                    </td>
+                    <td>
+                        @* Cliente: solo muestra el nombre y apellido, sin card ni onclick ni estilos especiales *@
+                        @{
+                            string nombreCliente = contrato.IdClientes.ToString();
+                            if (ViewBag.Clientes != null)
+                            {
+                                var clientes = ViewBag.Clientes as IEnumerable<Inmobiliaria_Rios.Models.Cliente>;
+                                var cliente = clientes?.FirstOrDefault(c => c.Id == contrato.IdClientes);
+                                if (cliente != null)
+                                {
+                                    nombreCliente = cliente.Nombre + " " + cliente.Apellido;
+                                }
+                            }
+                        }
+                        @nombreCliente
+                    </td>
                     <td>@contrato.FechaInicio.ToShortDateString()</td>
                     <td>@contrato.FechaFin.ToShortDateString()</td>
-                    <td>@contrato.MontoMensual</td>
-                    <td>@contrato.Estado</td>
+                    <td>
+                        @(contrato.FechaFinAnticipada.HasValue 
+                            ? contrato.FechaFinAnticipada.Value.ToShortDateString() 
+                            : "-")
+                    </td>
+                    <td>@contrato.MontoMensual.ToString("C")</td>
+                    <td>
+                        @(contrato.Multa.HasValue 
+                            ? contrato.Multa.Value.ToString("C") 
+                            : "-")
+                    </td>
+                    <td>
+                        @(contrato.Estado ? "Activo" : "Inactivo")
+                    </td>
+                    <td>
+                        @{
+                            var propUsuarioCreacion = contrato.GetType().GetProperty("UsuarioCreacionId");
+                            var valUsuarioCreacion = propUsuarioCreacion?.GetValue(contrato, null);
+                        }
+                        @(valUsuarioCreacion != null ? valUsuarioCreacion.ToString() : "-")
+                    </td>
+                    <td>
+                        @{
+                            var propFechaCreacion = contrato.GetType().GetProperty("FechaCreacion");
+                            var valFechaCreacion = propFechaCreacion?.GetValue(contrato, null);
+                        }
+                        @(valFechaCreacion is DateTime fechaCreacion ? fechaCreacion.ToString("g") : "-")
+                    </td>
+                    <td>
+                        @{
+                            var propUsuarioMod = contrato.GetType().GetProperty("UsuarioModificacionId");
+                            var valUsuarioMod = propUsuarioMod?.GetValue(contrato, null);
+                        }
+                        @(valUsuarioMod != null ? valUsuarioMod.ToString() : "-")
+                    </td>
+                    <td>
+                        @{
+                            var propFechaMod = contrato.GetType().GetProperty("FechaModificacion");
+                            var valFechaMod = propFechaMod?.GetValue(contrato, null);
+                        }
+                        @(valFechaMod is DateTime fechaMod ? fechaMod.ToString("g") : "-")
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
 </div>
+
+@* Se eliminó el formulario para crear un nuevo contrato *@
 
 <style>
     .search-container {
@@ -208,5 +292,13 @@
                 alerta.style.display = 'none';
             }, 3000);
         }
+    });
+
+    // Inicializar tooltips de Bootstrap para cliente e inmueble
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
     });
 </script>

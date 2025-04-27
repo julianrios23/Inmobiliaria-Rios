@@ -16,8 +16,9 @@ namespace Inmobiliaria_Rios.Models
         public DateTime? FechaFinAnticipada { get; set; }
         public decimal MontoMensual { get; set; }
         public decimal? Multa { get; set; }
-        public required string Estado { get; set; }
+        public bool Estado { get; set; }
         public DateTime FechaCreacion { get; set; }
         public DateTime? FechaModificacion { get; set; }
+        public int UsuarioCreacionId { get; set; }
     }
 }

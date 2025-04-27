@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using Inmobiliaria_Rios.Models; // Agrega este using para Contrato, Propiedad, Cliente
+using System;
 
 namespace Inmobiliaria_Rios.Controllers
 {
@@ -18,48 +19,99 @@ namespace Inmobiliaria_Rios.Controllers
         [HttpGet("")]
         public IActionResult Index()
         {
-            // Obtener lista de contratos desde la base de datos
-            List<Contrato> contratos = new List<Contrato>();
-            // ...cargar datos...
+            var contratos = contexto.Contratos.ToList();
+            ViewBag.Clientes = contexto.Clientes.ToList();
+            ViewBag.Inmuebles = contexto.Propiedades.ToList();
             return View(contratos);
         }
 
         [HttpGet("Create")]
         public IActionResult Create()
         {
-            return View();
+            // Redirigir a la vista de nuevo contrato con combos cargados
+            var inmuebles = contexto.Propiedades.ToList();
+            var clientes = contexto.Clientes.ToList();
+            ViewBag.Inmuebles = inmuebles;
+            ViewBag.Clientes = clientes;
+            return View("NuevoContrato");
         }
 
         [HttpPost("Create")]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(Contrato contrato)
         {
-            if (ModelState.IsValid)
-            {
-                contrato.Estado = "Activo"; // Inicializar el miembro requerido
+            // Log temporal para depuración
+            System.Diagnostics.Debug.WriteLine("POST Contrato:");
+            System.Diagnostics.Debug.WriteLine($"IdInmuebles: {contrato.IdInmuebles}");
+            System.Diagnostics.Debug.WriteLine($"IdClientes: {contrato.IdClientes}");
+            System.Diagnostics.Debug.WriteLine($"FechaInicio: {contrato.FechaInicio}");
+            System.Diagnostics.Debug.WriteLine($"FechaFin: {contrato.FechaFin}");
+            System.Diagnostics.Debug.WriteLine($"MontoMensual: {contrato.MontoMensual}");
 
-                // Cambiar estado del inmueble a no disponible (estado = 0)
-                var inmueble = contexto.Propiedades.FirstOrDefault(p => p.Id == contrato.IdInmuebles);
-                if (inmueble != null)
+            if (!ModelState.IsValid || contrato.IdInmuebles == 0 || contrato.IdClientes == 0)
+            {
+                if (contrato.IdInmuebles == 0)
+                    ModelState.AddModelError("IdInmuebles", "Debe seleccionar un inmueble.");
+                if (contrato.IdClientes == 0)
+                    ModelState.AddModelError("IdClientes", "Debe seleccionar un cliente.");
+
+                ViewBag.Inmuebles = contexto.Propiedades.ToList();
+                ViewBag.Clientes = contexto.Clientes.ToList();
+
+                // Mostrar errores de validación en la vista
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
                 {
-                    inmueble.Estado = false; // Cambia el estado a false (no disponible)
-                    contexto.Propiedades.Update(inmueble);
+                    System.Diagnostics.Debug.WriteLine("ModelState error: " + error.ErrorMessage);
                 }
 
-                // Guardar contrato en la base de datos
+                return View("NuevoContrato", contrato);
+            }
+
+            try
+            {
+                contrato.FechaCreacion = DateTime.Now;
+                contrato.Estado = true; // Booleano, se guarda como 1 en la base de datos
+
+                // Solución: asignar un valor por defecto a UsuarioCreacionId si existe en el modelo
+                var propUsuarioCreacion = contrato.GetType().GetProperty("UsuarioCreacionId");
+                if (propUsuarioCreacion != null && propUsuarioCreacion.PropertyType == typeof(int))
+                {
+                    // Puedes poner aquí el ID del usuario actual si tienes autenticación, o un valor fijo temporal
+                    propUsuarioCreacion.SetValue(contrato, 1); // 1 es un ejemplo, usa el valor adecuado
+                }
+
                 contexto.Contratos.Add(contrato);
                 contexto.SaveChanges();
 
+                TempData["Mensaje"] = "Contrato guardado correctamente.";
                 return RedirectToAction("Index");
             }
-            return View(contrato);
+            catch (Exception ex)
+            {
+                // Mostrar el error en la vista para depuración
+                ModelState.AddModelError("", "Error al guardar el contrato: " + ex.Message);
+                if (ex.InnerException != null)
+                {
+                    ModelState.AddModelError("", "Detalle: " + ex.InnerException.Message);
+                    System.Diagnostics.Debug.WriteLine("InnerException: " + ex.InnerException.Message);
+                }
+                ViewBag.Inmuebles = contexto.Propiedades.ToList();
+                ViewBag.Clientes = contexto.Clientes.ToList();
+                System.Diagnostics.Debug.WriteLine("Excepción al guardar: " + ex.Message);
+                return View("NuevoContrato", contrato);
+            }
         }
 
         [HttpGet("Edit/{id}")]
         public IActionResult Edit(int id)
         {
             // Obtener contrato por ID
-            Contrato contrato = new Contrato { Estado = "Activo" };
-            // ...cargar datos...
+            var contrato = contexto.Contratos.FirstOrDefault(c => c.Id == id);
+            if (contrato == null)
+            {
+                return NotFound();
+            }
+            // No asignar string a Estado, ya es bool
             return View(contrato);
         }
 
@@ -68,9 +120,20 @@ namespace Inmobiliaria_Rios.Controllers
         {
             if (ModelState.IsValid)
             {
-                contrato.Estado ??= "Activo"; // Asegurar que el miembro requerido esté inicializado
-                // Actualizar contrato en la base de datos
-                // ...actualizar datos...
+                // Buscar el contrato original en la base de datos
+                var contratoOriginal = contexto.Contratos.FirstOrDefault(c => c.Id == contrato.Id);
+                if (contratoOriginal != null)
+                {
+                    contratoOriginal.IdInmuebles = contrato.IdInmuebles;
+                    contratoOriginal.IdClientes = contrato.IdClientes;
+                    contratoOriginal.FechaInicio = contrato.FechaInicio;
+                    contratoOriginal.FechaFin = contrato.FechaFin;
+                    contratoOriginal.MontoMensual = contrato.MontoMensual;
+                    
+                    contratoOriginal.Estado = contrato.Estado;
+
+                    contexto.SaveChanges();
+                }
                 return RedirectToAction("Index");
             }
             return View(contrato);
