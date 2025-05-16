@@ -24,35 +24,47 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-success me-2" asp-area="" asp-controller="Home" asp-action="Propiedades">
+                            <a class="btn btn-success me-2 @(User.Identity == null || !User.Identity.IsAuthenticated ? "disabled" : "")" asp-area="" asp-controller="Home" asp-action="Propiedades" tabindex="@(User.Identity == null || !User.Identity.IsAuthenticated ? "-1" : "0")" aria-disabled="@(User.Identity == null || !User.Identity.IsAuthenticated ? "true" : "false")">
                                 <i class="bi bi-building me-1"></i> Inmuebles
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-success me-2" asp-area="" asp-controller="Home" asp-action="Clientes">
+                            <a class="btn btn-success me-2 @(User.Identity == null || !User.Identity.IsAuthenticated ? "disabled" : "")" asp-area="" asp-controller="Home" asp-action="Clientes" tabindex="@(User.Identity == null || !User.Identity.IsAuthenticated ? "-1" : "0")" aria-disabled="@(User.Identity == null || !User.Identity.IsAuthenticated ? "true" : "false")">
                                 <i class="bi bi-people me-1"></i> Clientes
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-success me-2" asp-area="" asp-controller="Home" asp-action="Propietarios">
+                            <a class="btn btn-success me-2 @(User.Identity == null || !User.Identity.IsAuthenticated ? "disabled" : "")" asp-area="" asp-controller="Home" asp-action="Propietarios" tabindex="@(User.Identity == null || !User.Identity.IsAuthenticated ? "-1" : "0")" aria-disabled="@(User.Identity == null || !User.Identity.IsAuthenticated ? "true" : "false")">
                                 <i class="bi bi-person-badge me-1"></i> Propietarios
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-success me-2" asp-area="" asp-controller="Contratos" asp-action="Index">
+                            <a class="btn btn-success me-2 @(User.Identity == null || !User.Identity.IsAuthenticated ? "disabled" : "")" asp-area="" asp-controller="Contratos" asp-action="Index" tabindex="@(User.Identity == null || !User.Identity.IsAuthenticated ? "-1" : "0")" aria-disabled="@(User.Identity == null || !User.Identity.IsAuthenticated ? "true" : "false")">
                                 <i class="bi bi-file-earmark-text me-1"></i> Contratos
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-success me-2" asp-area="" asp-controller="Pagos" asp-action="Index">
+                            <a class="btn btn-success me-2 @(User.Identity == null || !User.Identity.IsAuthenticated ? "disabled" : "")" asp-area="" asp-controller="Pagos" asp-action="Index" tabindex="@(User.Identity == null || !User.Identity.IsAuthenticated ? "-1" : "0")" aria-disabled="@(User.Identity == null || !User.Identity.IsAuthenticated ? "true" : "false")">
                                 <i class="bi bi-cash-coin me-1"></i> Pagos
                             </a>
                         </li>
                     </ul>
-                    <div class="d-flex">
-                        <a href="@Url.Action("Login", "Account")" class="btn btn-success me-2">
-                            <i class="bi bi-box-arrow-in-right me-1"></i> Login
-                        </a>
+                    <div class="d-flex align-items-center">
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <span class="text-light me-2">
+                                <i class="bi bi-person-circle me-1"></i> @(User.Identity.Name ?? "")
+                            </span>
+                            <button type="button" class="btn btn-danger me-2" onclick="showLogoutModal()">
+                                <i class="bi bi-box-arrow-right me-1"></i> Logout
+                            </button>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Login", "Account")" class="btn btn-success me-2">
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                            </a>
+                        }
                         <a href="@Url.Action("Contacto", "Home")" class="btn btn-info">
                             <i class="bi bi-envelope me-1"></i> Contacto
                         </a>
@@ -73,9 +85,39 @@
             &copy; 2025 - <span class="fw-bold ms-1">Practico ASP.NET by Julian Rios</span> 
         </div>
     </footer>
+
+    <!-- Modal de confirmación de logout al estilo EditarCliente -->
+    <div id="logoutModal" class="modal" tabindex="-1" style="display: none;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmación</h5>
+                    <button type="button" class="btn-close" onclick="closeLogoutModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Seguro que deseas cerrar sesión?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeLogoutModal()">Cancelar</button>
+                    <form method="post" action="@Url.Action("Logout", "Account")" class="d-inline m-0">
+                        <button type="submit" class="btn btn-danger">Confirmar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        function showLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'block';
+        }
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'none';
+        }
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

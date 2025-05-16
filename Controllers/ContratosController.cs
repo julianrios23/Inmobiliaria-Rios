@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Inmobiliaria_Rios.Models; // Agrega este using para Contrato, Propiedad, Cliente
 using System;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Inmobiliaria_Rios.Controllers
 {
     [Route("Contratos")]
+    [Authorize]
     public class ContratosController : Controller
     {
         private readonly Inmobiliaria_Rios.Data.ApplicationDbContext contexto;

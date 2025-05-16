@@ -1,29 +1,27 @@
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Iniciar Sesión";
 }
-
-<div class="container d-flex flex-column align-items-center justify-content-center" style="height: 100vh; margin-top: -20px;">
-    <div class="card shadow-lg" style="width: 100%; max-width: 400px; border-radius: 15px;">
-        <div class="card-body p-4">
-            <h3 class="card-title text-center mb-4 text-primary">Iniciar Sesión</h3>
-            @if (TempData["Error"] != null)
+<div class="container d-flex flex-column align-items-center justify-content-center" style="height: 100vh;">
+    <div class="card shadow" style="width: 100%; max-width: 400px;">
+        <div class="card-body">
+            <h3 class="card-title text-center mb-4">Iniciar Sesión</h3>
+            @if (ViewBag.Error != null)
             {
-                <div class="alert alert-danger text-center">@TempData["Error"]</div>
+                <div class="alert alert-danger">@ViewBag.Error</div>
             }
             <form method="post" asp-action="Login" asp-controller="Account">
                 <div class="mb-3">
-                    <label for="username" class="form-label text-secondary">Usuario</label>
-                    <input type="text" class="form-control shadow-sm" id="username" name="username" placeholder="Ingresa tu usuario" required />
+                    <label for="username" class="form-label">Usuario</label>
+                    <input type="text" class="form-control" id="username" name="username" required />
                 </div>
                 <div class="mb-3">
-                    <label for="password" class="form-label text-secondary">Contraseña</label>
-                    <input type="password" class="form-control shadow-sm" id="password" name="password" placeholder="Ingresa tu contraseña" required />
+                    <label for="password" class="form-label">Contraseña</label>
+                    <input type="password" class="form-control" id="password" name="password" required />
                 </div>
-                <button type="submit" class="btn btn-primary w-100 shadow-sm">Ingresar</button>
+                <button type="submit" class="btn btn-success w-100">Ingresar</button>
             </form>
-            <div class="text-center mt-4">
-                <p class="mb-2">¿Olvidaste tu contraseña? <a href="@Url.Action("ForgotPassword", "Account")" class="text-primary">Recupérala aquí</a></p>
-                <p>¿No tienes una cuenta? <a href="@Url.Action("Register", "Account")" class="text-primary">Regístrate aquí</a></p>
+            <div class="text-center mt-3">
+                <p>¿No tienes cuenta? <a href="@Url.Action("Register", "Account")" class="text-primary">Regístrate aquí</a></p>
             </div>
         </div>
     </div>
