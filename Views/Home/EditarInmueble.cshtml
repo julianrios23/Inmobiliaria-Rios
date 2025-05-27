@@ -250,9 +250,6 @@
 
             form.addEventListener('input', checkForChanges);
             form.addEventListener('change', checkForChanges);
-
-            
-            checkForChanges();
         });
 
         let confirmModal = document.getElementById('confirmModal');
@@ -268,7 +265,7 @@
 
         function submitForm() {
             confirmModal.style.display = 'none';
-            document.getElementById('editarInmuebleForm').submit(); 
+            document.getElementById('editarInmuebleForm').submit(); // Envía el formulario después de confirmar
         }
 
         function eliminarImagen(imagenId) {

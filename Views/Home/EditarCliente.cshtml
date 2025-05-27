@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Editar Cliente";
+    var esAdmin = User.IsInRole("admin");
+    var esEmpleado = User.IsInRole("empleado");
 }
 <style>
     .text-primary {
@@ -49,35 +51,70 @@
             </div>
             <div class="form-group">
                 <label for="Telefono">Teléfono</label>
-                <input asp-for="Telefono" class="form-control" />
+                @if (esAdmin)
+                {
+                    <input asp-for="Telefono" class="form-control" />
+                }
+                else
+                {
+                    <input asp-for="Telefono" class="form-control" readonly />
+                }
                 <span asp-validation-for="Telefono" class="text-danger"></span>
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <label for="Email">Email</label>
-                <input asp-for="Email" class="form-control" />
+                @if (esAdmin)
+                {
+                    <input asp-for="Email" class="form-control" />
+                }
+                else
+                {
+                    <input asp-for="Email" class="form-control" readonly />
+                }
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label for="Domicilio">Domicilio</label>
-                <input asp-for="Domicilio" class="form-control" />
+                @if (esAdmin)
+                {
+                    <input asp-for="Domicilio" class="form-control" />
+                }
+                else
+                {
+                    <input asp-for="Domicilio" class="form-control" readonly />
+                }
                 <span asp-validation-for="Domicilio" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label for="Localidad">Localidad</label>
-                <input asp-for="Localidad" class="form-control" />
+                @if (esAdmin)
+                {
+                    <input asp-for="Localidad" class="form-control" />
+                }
+                else
+                {
+                    <input asp-for="Localidad" class="form-control" readonly />
+                }
                 <span asp-validation-for="Localidad" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label for="Provincia">Provincia</label>
-                <input asp-for="Provincia" class="form-control" />
+                @if (esAdmin)
+                {
+                    <input asp-for="Provincia" class="form-control" />
+                }
+                else
+                {
+                    <input asp-for="Provincia" class="form-control" readonly />
+                }
                 <span asp-validation-for="Provincia" class="text-danger"></span>
             </div>
         </div>
     </div>
     <div class="text-center mt-3">
-        <button type="submit" class="btn btn-primary" id="guardarBtn" disabled>
+        <button type="submit" class="btn btn-primary" id="guardarBtn" @(esAdmin ? "" : "disabled")>
             <i class="bi bi-save me-2"></i>Guardar
         </button>
         <a href="@Url.Action("Clientes", "Home")" class="btn btn-secondary">
@@ -86,19 +123,19 @@
     </div>
 </form>
 
-<div id="confirmModal" class="modal" tabindex="-1" style="display: none;">
+<!-- Modal de advertencia para empleados -->
+<div id="noPermisoModal" class="modal" tabindex="-1" style="display: none;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirmación</h5>
-                <button type="button" class="btn-close" onclick="closeModal()"></button>
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title text-dark">Permiso denegado</h5>
+                <button type="button" class="btn-close" onclick="closeNoPermisoModal()"></button>
             </div>
             <div class="modal-body">
-                <p>¿Está seguro de que desea guardar los cambios?</p>
+                <p>No tienes permisos para editar clientes. Solo los administradores pueden realizar modificaciones.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="submitForm()">Confirmar</button>
+                <button type="button" class="btn btn-secondary" onclick="closeNoPermisoModal()">Cerrar</button>
             </div>
         </div>
     </div>
@@ -109,10 +146,25 @@
     <script>
         let form = document.getElementById('editarClienteForm');
         let confirmModal = document.getElementById('confirmModal');
+        let noPermisoModal = document.getElementById('noPermisoModal');
+        let esAdmin = @(esAdmin.ToString().ToLower());
+        let esEmpleado = @(esEmpleado.ToString().ToLower());
 
         function confirmSave() {
+            if (esEmpleado && !esAdmin) {
+                showNoPermisoModal();
+                return false;
+            }
+            if (!esAdmin) return false;
             confirmModal.style.display = 'block';
             return false; // Evita el envío del formulario hasta que se confirme
+        }
+
+        function showNoPermisoModal() {
+            noPermisoModal.style.display = 'block';
+        }
+        function closeNoPermisoModal() {
+            noPermisoModal.style.display = 'none';
         }
 
         function closeModal() {
@@ -121,7 +173,7 @@
 
         function submitForm() {
             confirmModal.style.display = 'none';
-            form.submit(); // Envía el formulario después de confirmar
+            if (esAdmin) form.submit(); // Envía el formulario después de confirmar solo si es admin
         }
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -146,11 +198,19 @@
                     }
                 }
 
-                guardarBtn.disabled = !isChanged;
+                guardarBtn.disabled = !isChanged || !esAdmin;
             }
 
             form.addEventListener('input', checkForChanges);
             form.addEventListener('change', checkForChanges);
+
+            // Si es empleado, bloquear el evento submit por click en el botón guardar
+            if (esEmpleado && !esAdmin) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    showNoPermisoModal();
+                });
+            }
         });
     </script>
 }

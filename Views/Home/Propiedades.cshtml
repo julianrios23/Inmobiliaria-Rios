@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Inmuebles";
+    var esEmpleado = User.IsInRole("empleado") && !User.IsInRole("admin");
 }
 <style>
     #lead-text-secondary{
@@ -246,7 +247,8 @@
         </div>
     </div>
     <div class="col-md-3 col-sm-6 ms-auto">
-        <a href="@Url.Action("NuevoInmueble", "Home")" class="btn btn-success btn-sm px-4 py-2 d-flex align-items-center justify-content-center">
+        <a href="#" class="btn btn-success btn-sm px-4 py-2 d-flex align-items-center justify-content-center @(esEmpleado ? "disabled" : "")"
+           @(esEmpleado ? "onclick=\"mostrarNoPermisoModal(event);return false;\"" : $"href='{Url.Action("NuevoInmueble", "Home")}'")>
             <i class="bi bi-plus-circle me-2"></i>
             <span>Nuevo Inmueble</span>
         </a>
@@ -281,47 +283,108 @@
         <tbody id="tableBody">
             @foreach (var propiedad in Model)
             {
-                <tr class="align-middle property-row" style="cursor: pointer;" onclick="location.href='@Url.Action("EditarInmueble", "Home", new { id = propiedad.Id })'">
-                    <td>
-                        @if (propiedad.Propietario != null)
-                        {
-                            <a href="javascript:void(0);" onclick="event.stopPropagation(); showPropietarioCard(@propiedad.Propietario.Id)" class="text-decoration-none text-primary">
-                                @($"{propiedad.Propietario.Nombre} {propiedad.Propietario.Apellido}")
-                            </a>
-                        }
-                        else
-                        {
-                            <span class="text-muted">Sin Propietario</span>
-                        }
-                    </td>
-                    <td>@propiedad.Localidad</td>
-                    <td>@propiedad.Provincia</td>
-                    <td>@propiedad.Direccion</td>
-                    <td class="text-center">
-                        <button class="btn btn-primary btn-sm" onclick="verImagenes(@propiedad.Id); event.stopPropagation();">Ver</button>
-                    </td>
-                    <td>@propiedad.Tipo</td>
-                    <td>@propiedad.Ambientes</td>
-                    <td>@propiedad.Banos</td>
-                    <td class="text-center">@propiedad.Garage</td>
-                    <td class="text-center">@propiedad.CapGarage</td>
-                    <td class="text-center">@propiedad.Patio</td>
-                    <td class="text-center">@propiedad.Piscina</td>
-                    <td class="text-center">@propiedad.Terraza</td>
-                    <td class="text-center">@propiedad.Plantas</td>
-                    <td class="text-center">@propiedad.Cocina</td>
-                    <td class="text-center">@propiedad.Parrilla</td>
-                    <td class="text-center">@propiedad.Opcion</td>
-                    <td class="text-end">@string.Format("{0:C0}", propiedad.Precio)</td>
-                    <td>
-                        <span data-bs-toggle="tooltip" title="@propiedad.Observaciones">
-                            @propiedad.Observaciones
-                        </span>
-                    </td>
-                </tr>
+                if (esEmpleado)
+                {
+                    <tr class="align-middle property-row" style="cursor: pointer;" onclick="mostrarNoPermisoModal(event);">
+                        <td>
+                            @if (propiedad.Propietario != null)
+                            {
+                                <a href="javascript:void(0);" onclick="event.stopPropagation(); showPropietarioCard(@propiedad.Propietario.Id)" class="text-decoration-none text-primary">
+                                    @($"{propiedad.Propietario.Nombre} {propiedad.Propietario.Apellido}")
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Sin Propietario</span>
+                            }
+                        </td>
+                        <td>@propiedad.Localidad</td>
+                        <td>@propiedad.Provincia</td>
+                        <td>@propiedad.Direccion</td>
+                        <td class="text-center">
+                            <button class="btn btn-primary btn-sm" onclick="verImagenes(@propiedad.Id); event.stopPropagation();">Ver</button>
+                        </td>
+                        <td>@propiedad.Tipo</td>
+                        <td>@propiedad.Ambientes</td>
+                        <td>@propiedad.Banos</td>
+                        <td class="text-center">@propiedad.Garage</td>
+                        <td class="text-center">@propiedad.CapGarage</td>
+                        <td class="text-center">@propiedad.Patio</td>
+                        <td class="text-center">@propiedad.Piscina</td>
+                        <td class="text-center">@propiedad.Terraza</td>
+                        <td class="text-center">@propiedad.Plantas</td>
+                        <td class="text-center">@propiedad.Cocina</td>
+                        <td class="text-center">@propiedad.Parrilla</td>
+                        <td class="text-center">@propiedad.Opcion</td>
+                        <td class="text-end">@string.Format("{0:C0}", propiedad.Precio)</td>
+                        <td>
+                            <span data-bs-toggle="tooltip" title="@propiedad.Observaciones">
+                                @propiedad.Observaciones
+                            </span>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    <tr class="align-middle property-row" style="cursor: pointer;" onclick="window.location.href='@Url.Action("EditarInmueble", "Home", new { id = propiedad.Id })'">
+                        <td>
+                            @if (propiedad.Propietario != null)
+                            {
+                                <a href="javascript:void(0);" onclick="event.stopPropagation(); showPropietarioCard(@propiedad.Propietario.Id)" class="text-decoration-none text-primary">
+                                    @($"{propiedad.Propietario.Nombre} {propiedad.Propietario.Apellido}")
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Sin Propietario</span>
+                            }
+                        </td>
+                        <td>@propiedad.Localidad</td>
+                        <td>@propiedad.Provincia</td>
+                        <td>@propiedad.Direccion</td>
+                        <td class="text-center">
+                            <button class="btn btn-primary btn-sm" onclick="verImagenes(@propiedad.Id); event.stopPropagation();">Ver</button>
+                        </td>
+                        <td>@propiedad.Tipo</td>
+                        <td>@propiedad.Ambientes</td>
+                        <td>@propiedad.Banos</td>
+                        <td class="text-center">@propiedad.Garage</td>
+                        <td class="text-center">@propiedad.CapGarage</td>
+                        <td class="text-center">@propiedad.Patio</td>
+                        <td class="text-center">@propiedad.Piscina</td>
+                        <td class="text-center">@propiedad.Terraza</td>
+                        <td class="text-center">@propiedad.Plantas</td>
+                        <td class="text-center">@propiedad.Cocina</td>
+                        <td class="text-center">@propiedad.Parrilla</td>
+                        <td class="text-center">@propiedad.Opcion</td>
+                        <td class="text-end">@string.Format("{0:C0}", propiedad.Precio)</td>
+                        <td>
+                            <span data-bs-toggle="tooltip" title="@propiedad.Observaciones">
+                                @propiedad.Observaciones
+                            </span>
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
+</div>
+
+<div id="noPermisoModal" class="modal" tabindex="-1" style="display: none;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title text-dark">Permiso denegado</h5>
+                <button type="button" class="btn-close" onclick="closeNoPermisoModal()"></button>
+            </div>
+            <div class="modal-body">
+                <p>No tienes permisos para editar propiedades ni agregar propiedades. Comuniquese con el administrador</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeNoPermisoModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Modal para mostrar imágenes -->
@@ -465,5 +528,31 @@ function verImagenes(idInmueble) {
             const modal = new bootstrap.Modal(document.getElementById('imagenesModal'));
             modal.show();
         });
+}
+
+function mostrarNoPermisoModal(event) {
+    event.stopPropagation();
+    var modal = document.getElementById('noPermisoModal');
+    if (modal) {
+        modal.style.display = 'block';
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            try {
+                var bsModal = bootstrap.Modal.getOrCreateInstance(modal);
+                bsModal.show();
+            } catch {}
+        }
+    }
+}
+function closeNoPermisoModal() {
+    var modal = document.getElementById('noPermisoModal');
+    if (modal) {
+        modal.style.display = 'none';
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            try {
+                var bsModal = bootstrap.Modal.getInstance(modal);
+                if (bsModal) bsModal.hide();
+            } catch {}
+        }
+    }
 }
 </script>

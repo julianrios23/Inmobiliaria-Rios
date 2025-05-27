@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Propietarios";
+    var esEmpleado = User.IsInRole("empleado") && !User.IsInRole("admin");
 }
 <style>
     #lead-text-secondary{
@@ -41,7 +42,8 @@
         </div>
     </div>
     <div class="col-md-3 col-sm-6 ms-auto">
-        <a href="@Url.Action("NuevoPropietario", "Home")" class="btn btn-success btn-sm px-4 py-2 d-flex align-items-center justify-content-center">
+        <a href="#" class="btn btn-success btn-sm px-4 py-2 d-flex align-items-center justify-content-center @(esEmpleado ? "disabled" : "")"
+           @(esEmpleado ? "onclick=\"mostrarNoPermisoModal(event);return false;\"" : $"href='{Url.Action("NuevoPropietario", "Home")}'")>
             <i class="bi bi-plus-circle me-2"></i>
             <span>Nuevo Propietario</span>
         </a>
@@ -66,20 +68,54 @@
         <tbody id="tableBody">
             @foreach(var propietario in Model)
             {
-                <tr class="align-middle" style="cursor: pointer;" onclick="window.location.href='@Url.Action("EditarPropietario", "Home", new { id = propietario.Id })'">
-                    <td>@propietario.Nombre</td>
-                    <td>@propietario.Apellido</td>
-                    <td>@propietario.DNI</td>
-                    <td>@propietario.Cuit</td> <!-- Cambiado de CUIT a Cuit -->
-                    <td>@propietario.Telefono</td>
-                    <td>@propietario.Mail</td>
-                    <td>@propietario.Domicilio</td>
-                    <td>@propietario.Localidad</td>
-                    <td>@propietario.Provincia</td>
-                </tr>
+                if (esEmpleado)
+                {
+                    <tr class="align-middle" style="cursor: pointer;" onclick="mostrarNoPermisoModal(event);">
+                        <td>@propietario.Nombre</td>
+                        <td>@propietario.Apellido</td>
+                        <td>@propietario.DNI</td>
+                        <td>@propietario.Cuit</td>
+                        <td>@propietario.Telefono</td>
+                        <td>@propietario.Mail</td>
+                        <td>@propietario.Domicilio</td>
+                        <td>@propietario.Localidad</td>
+                        <td>@propietario.Provincia</td>
+                    </tr>
+                }
+                else
+                {
+                    <tr class="align-middle" style="cursor: pointer;" onclick="window.location.href='@Url.Action("EditarPropietario", "Home", new { id = propietario.Id })'">
+                        <td>@propietario.Nombre</td>
+                        <td>@propietario.Apellido</td>
+                        <td>@propietario.DNI</td>
+                        <td>@propietario.Cuit</td>
+                        <td>@propietario.Telefono</td>
+                        <td>@propietario.Mail</td>
+                        <td>@propietario.Domicilio</td>
+                        <td>@propietario.Localidad</td>
+                        <td>@propietario.Provincia</td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
+</div>
+
+<div id="noPermisoModal" class="modal" tabindex="-1" style="display: none;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title text-dark">Permiso denegado</h5>
+                <button type="button" class="btn-close" onclick="closeNoPermisoModal()"></button>
+            </div>
+            <div class="modal-body">
+                <p>No tienes permisos para editar propietarios ni agregar propietarios. Comuniquese con el administrador</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeNoPermisoModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -214,4 +250,12 @@
             }, 3000);
         }
     });
+
+    function mostrarNoPermisoModal(event) {
+        event.stopPropagation();
+        document.getElementById('noPermisoModal').style.display = 'block';
+    }
+    function closeNoPermisoModal() {
+        document.getElementById('noPermisoModal').style.display = 'none';
+    }
 </script>
