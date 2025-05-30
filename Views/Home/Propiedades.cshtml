@@ -247,11 +247,21 @@
         </div>
     </div>
     <div class="col-md-3 col-sm-6 ms-auto">
-        <a href="#" class="btn btn-success btn-sm px-4 py-2 d-flex align-items-center justify-content-center @(esEmpleado ? "disabled" : "")"
-           @(esEmpleado ? "onclick=\"mostrarNoPermisoModal(event);return false;\"" : $"href='{Url.Action("NuevoInmueble", "Home")}'")>
-            <i class="bi bi-plus-circle me-2"></i>
-            <span>Nuevo Inmueble</span>
-        </a>
+        @if (esEmpleado)
+        {
+            <a href="#" class="btn btn-success btn-sm px-4 py-2 d-flex align-items-center justify-content-center disabled"
+               onclick="mostrarNoPermisoModal(event);return false;">
+                <i class="bi bi-plus-circle me-2"></i>
+                <span>Nuevo Inmueble</span>
+            </a>
+        }
+        else
+        {
+            <a href="@Url.Action("NuevoInmueble", "Home")" class="btn btn-success btn-sm px-4 py-2 d-flex align-items-center justify-content-center">
+                <i class="bi bi-plus-circle me-2"></i>
+                <span>Nuevo Inmueble</span>
+            </a>
+        }
     </div>
 </div>
 
@@ -378,7 +388,7 @@
                 <button type="button" class="btn-close" onclick="closeNoPermisoModal()"></button>
             </div>
             <div class="modal-body">
-                <p>No tienes permisos para editar propiedades ni agregar propiedades. Comuniquese con el administrador</p>
+                <p>No tienes permisos para editar Inmuebles ni agregar Inmuebles. Comuniquese con el administrador</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeNoPermisoModal()">Cerrar</button>

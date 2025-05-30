@@ -24,11 +24,21 @@
         </div>
     </div>
     <div class="col-md-3 col-sm-6 ms-auto">
-        <a href="#" class="btn btn-success btn-sm px-4 py-2 d-flex align-items-center justify-content-center @(esEmpleado ? "disabled" : "")"
-           @(esEmpleado ? "onclick=\"mostrarNoPermisoModal(event);return false;\"" : $"href='{Url.Action("NuevoCliente", "Home")}'")>
-            <i class="bi bi-plus-circle me-2"></i>
-            <span>Nuevo Cliente</span>
-        </a>
+        @if (esEmpleado)
+        {
+            <a href="#" class="btn btn-success btn-sm px-4 py-2 d-flex align-items-center justify-content-center disabled"
+               onclick="mostrarNoPermisoModal(event);return false;">
+                <i class="bi bi-plus-circle me-2"></i>
+                <span>Nuevo Cliente</span>
+            </a>
+        }
+        else
+        {
+            <a href="@Url.Action("NuevoCliente", "Home")" class="btn btn-success btn-sm px-4 py-2 d-flex align-items-center justify-content-center">
+                <i class="bi bi-plus-circle me-2"></i>
+                <span>Nuevo Cliente</span>
+            </a>
+        }
     </div>
 </div>
 
