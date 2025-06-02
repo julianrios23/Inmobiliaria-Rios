@@ -58,7 +58,7 @@
             </div>
         </div>
         <div class="d-flex justify-content-center gap-2 mt-4">
-            <button type="submit" class="btn btn-primary" id="guardarBtn" disabled>
+            <button type="button" class="btn btn-primary" id="guardarBtn" disabled data-bs-toggle="modal" data-bs-target="#confirmModal">
                 <i class="bi bi-save me-2"></i>Guardar
             </button>
             <a href="@Url.Action("Index", "Contratos")" class="btn btn-secondary">
@@ -66,6 +66,25 @@
             </a>
         </div>
     </form>
+
+    <!-- Modal de confirmación -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Confirmar creación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro que desea guardar este contrato?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="confirmarGuardarBtn">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
@@ -85,7 +104,8 @@
                 return;
             }
             const filtered = inmuebles
-                .filter(i => i.Opcion && i.Opcion.toLowerCase() === "alquiler") // Solo alquiler
+                .filter(i => i.Opcion && i.Opcion.toLowerCase() === "alquiler")
+                .filter(i => i.Estado == 1 || i.Estado === true || i.Estado === "1") // Acepta 1, true o "1"
                 .filter(i =>
                     (i.Direccion && i.Direccion.toLowerCase().includes(searchTerm)) ||
                     (i.Tipo && i.Tipo.toLowerCase().includes(searchTerm)) ||
@@ -217,11 +237,17 @@
             validateForm(); // Validar al cargar la página
         });
 
-        // Confirmación antes de guardar
-        document.getElementById('formContrato').addEventListener('submit', function (e) {
-            if (!confirm('¿Está seguro que desea guardar este contrato?')) {
-                e.preventDefault();
-            }
+        // Confirmación antes de guardar con modal
+        document.addEventListener('DOMContentLoaded', function () {
+            const guardarBtn = document.getElementById('guardarBtn');
+            const confirmarGuardarBtn = document.getElementById('confirmarGuardarBtn');
+            const form = document.getElementById('formContrato');
+
+            confirmarGuardarBtn.addEventListener('click', function () {
+                var modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+                if (modal) modal.hide();
+                form.submit();
+            });
         });
     </script>
 }

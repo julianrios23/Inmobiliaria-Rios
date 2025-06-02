@@ -1,0 +1,185 @@
+@model Inmobiliaria_Rios.Models.Contrato
+@{
+    ViewData["Title"] = "Editar Contrato";
+    var inmuebles = ViewBag.Inmuebles as IEnumerable<Inmobiliaria_Rios.Models.Propiedad> ?? Enumerable.Empty<Inmobiliaria_Rios.Models.Propiedad>();
+    var clientes = ViewBag.Clientes as IEnumerable<Inmobiliaria_Rios.Models.Cliente> ?? Enumerable.Empty<Inmobiliaria_Rios.Models.Cliente>();
+    var usuarios = ViewBag.Usuarios as IEnumerable<Inmobiliaria_Rios.Models.Usuario> ?? Enumerable.Empty<Inmobiliaria_Rios.Models.Usuario>();
+}
+
+<h1 class="display-4-text-primary mb-4">Editar Contrato</h1>
+<form asp-action="Edit" asp-controller="Contratos" method="post" class="row g-3" id="formEditarContrato">
+    <input type="hidden" asp-for="Id" />
+    <div class="col-md-6">
+        <label class="form-label">Inmueble</label>
+        @{
+            var inmuebleSel = inmuebles.FirstOrDefault(i => i.Id == Model.IdInmuebles);
+            var inmuebleTexto = inmuebleSel != null
+                ? $"{inmuebleSel.Direccion} - {inmuebleSel.Tipo} - {inmuebleSel.Provincia} - {inmuebleSel.Localidad}"
+                : "";
+        }
+        <input type="text" class="form-control" value="@inmuebleTexto" readonly />
+        <input type="hidden" asp-for="IdInmuebles" />
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">Cliente</label>
+        @{
+            var clienteSel = clientes.FirstOrDefault(c => c.Id == Model.IdClientes);
+            var clienteTexto = clienteSel != null
+                ? $"{clienteSel.Nombre} {clienteSel.Apellido} - {clienteSel.DNI}"
+                : "";
+        }
+        <input type="text" class="form-control" value="@clienteTexto" readonly />
+        <input type="hidden" asp-for="IdClientes" />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="FechaInicio" class="form-label">Fecha Inicio</label>
+        <input asp-for="FechaInicio" type="date" class="form-control" required id="FechaInicio" />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="FechaFin" class="form-label">Fecha Fin</label>
+        <input asp-for="FechaFin" type="date" class="form-control" required id="FechaFin" />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="FechaFinAnticipada" class="form-label">Fecha Fin Anticipada</label>
+        <input asp-for="FechaFinAnticipada" type="date" class="form-control" id="FechaFinAnticipada" />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="MontoMensual" class="form-label">Monto Mensual</label>
+        <input asp-for="MontoMensual" type="number" step="0.01" class="form-control" required id="MontoMensual" />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Multa" class="form-label">Multa</label>
+        <input asp-for="Multa" type="number" step="0.01" class="form-control" id="Multa" />
+        <span class="text-danger" id="multaError"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Estado" class="form-label">Estado</label>
+        <select asp-for="Estado" class="form-select">
+            <option value="true" selected="@(Model.Estado ? "selected" : null)">Activo</option>
+            <option value="false" selected="@(Model.Estado ? null : "selected")">Inactivo</option>
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">Usuario Creación</label>
+        <input type="text" class="form-control" value="@(
+            usuarios?.FirstOrDefault(u => u.Idusuarios == Model.UsuarioCreacionId)?.Nombre + " " +
+            usuarios?.FirstOrDefault(u => u.Idusuarios == Model.UsuarioCreacionId)?.Apellido
+        )" readonly />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="FechaCreacion" class="form-label">Fecha Creación</label>
+        <input asp-for="FechaCreacion" type="text" class="form-control" readonly />
+    </div>
+    <div class="col-12 text-center mt-4">
+        <button type="button" class="btn btn-success me-2" id="guardarBtn" disabled data-bs-toggle="modal" data-bs-target="#confirmModal">
+            <i class="bi bi-save"></i> Guardar
+        </button>
+        <a href="@Url.Action("Index", "Contratos")" class="btn btn-secondary">
+            <i class="bi bi-x-circle"></i> Cancelar
+        </a>
+    </div>
+</form>
+
+<!-- Modal de confirmación -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirmar cambios</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro que desea guardar los cambios del contrato?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="confirmarGuardarBtn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('formEditarContrato');
+            const guardarBtn = document.getElementById('guardarBtn');
+            const originalData = new FormData(form);
+
+            const fechaFinAnticipada = document.getElementById('FechaFinAnticipada');
+            const fechaFin = document.getElementById('FechaFin');
+            const multaInput = document.getElementById('Multa');
+            const multaError = document.getElementById('multaError');
+
+            function checkForChanges() {
+                const currentData = new FormData(form);
+                let isChanged = false;
+
+                for (let [key, value] of currentData.entries()) {
+                    if (originalData.get(key) !== value) {
+                        isChanged = true;
+                        break;
+                    }
+                }
+
+                guardarBtn.disabled = !isChanged || !validarMulta();
+            }
+
+            function validarMulta() {
+                multaError.textContent = "";
+                const fechaFinValue = fechaFin.value;
+                const fechaFinAnticipadaValue = fechaFinAnticipada.value;
+                const multaValue = multaInput.value;
+                const estadoSelect = document.querySelector('select[name="Estado"]');
+                const estadoValue = estadoSelect ? estadoSelect.value : null;
+
+                // Si la fecha anticipada es anterior a la fecha de fin, pedir multa
+                if (fechaFinAnticipadaValue && fechaFinValue) {
+                    const fechaFinDate = new Date(fechaFinValue);
+                    const fechaFinAnticipadaDate = new Date(fechaFinAnticipadaValue);
+
+                    if (fechaFinAnticipadaDate >= fechaFinDate) {
+                        multaError.textContent = "La fecha anticipada debe ser anterior a la fecha de fin.";
+                        return false;
+                    }
+                    if (fechaFinAnticipadaDate < fechaFinDate) {
+                        if (!multaValue || isNaN(parseFloat(multaValue)) || parseFloat(multaValue) <= 0) {
+                            multaError.textContent = "Debe ingresar un monto de multa";
+                            return false;
+                        }
+                    }
+                }
+
+                // Si el estado pasa a inactivo, pedir multa obligatoria
+                if (estadoValue === "false") {
+                    if (!multaValue || isNaN(parseFloat(multaValue)) || parseFloat(multaValue) <= 0) {
+                        multaError.textContent = "Debe ingresar un monto de multa para cancelar el contrato";
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            form.addEventListener('input', checkForChanges);
+            form.addEventListener('change', checkForChanges);
+
+            fechaFinAnticipada.addEventListener('input', checkForChanges);
+            fechaFin.addEventListener('input', checkForChanges);
+            multaInput.addEventListener('input', checkForChanges);
+
+            // Validar al cargar la página
+            checkForChanges();
+
+            // Reemplaza el submit directo por el modal
+            const confirmarGuardarBtn = document.getElementById('confirmarGuardarBtn');
+
+            confirmarGuardarBtn.addEventListener('click', function () {
+                // Cierra el modal y envía el formulario
+                var modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+                if (modal) modal.hide();
+                form.submit();
+            });
+        });
+    </script>
+}

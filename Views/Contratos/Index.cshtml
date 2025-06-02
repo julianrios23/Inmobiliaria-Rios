@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Contratos";
+    var usuarios = ViewBag.Usuarios as IEnumerable<Inmobiliaria_Rios.Models.Usuario>;
 }
 <style>
     #lead-text-secondary {
@@ -70,7 +71,7 @@
         <tbody id="tableBody">
             @foreach (var contrato in Model)
             {
-                <tr class="align-middle" style="cursor: pointer;" onclick="window.location.href='@Url.Action("Edit", "Contratos", new { id = contrato.Id })'">
+                <tr class="align-middle" style="cursor: pointer;" onclick="window.location.href='@Url.Action("EditarContrato", "Contratos", new { id = contrato.Id })'">
                     @* IDs ocultos, no se muestran en la tabla *@
                     @* <td style="display:none;">@contrato.Id</td> *@
                     @* <td style="display:none;">@contrato.IdInmuebles</td> *@
@@ -127,10 +128,19 @@
                     </td>
                     <td>
                         @{
-                            var propUsuarioCreacion = contrato.GetType().GetProperty("UsuarioCreacionId");
-                            var valUsuarioCreacion = propUsuarioCreacion?.GetValue(contrato, null);
+                            // Mostrar nombre y apellido del usuario de creación
+                            string usuarioCreacion = "-";
+                            if (ViewBag.Usuarios != null)
+                            {
+                                var usuariosList = ViewBag.Usuarios as IEnumerable<Inmobiliaria_Rios.Models.Usuario>;
+                                var usuario = usuariosList?.FirstOrDefault(u => u.Idusuarios == contrato.UsuarioCreacionId);
+                                if (usuario != null)
+                                {
+                                    usuarioCreacion = usuario.Nombre + " " + usuario.Apellido;
+                                }
+                            }
                         }
-                        @(valUsuarioCreacion != null ? valUsuarioCreacion.ToString() : "-")
+                        @usuarioCreacion
                     </td>
                     <td>
                         @{
@@ -141,10 +151,33 @@
                     </td>
                     <td>
                         @{
-                            var propUsuarioMod = contrato.GetType().GetProperty("UsuarioModificacionId");
-                            var valUsuarioMod = propUsuarioMod?.GetValue(contrato, null);
+                            // Mostrar nombre y apellido del usuario de modificación
+                            string usuarioMod = "-";
+                            if (ViewBag.Usuarios != null)
+                            {
+                                var usuariosList = ViewBag.Usuarios as IEnumerable<Inmobiliaria_Rios.Models.Usuario>;
+                                // Usa el campo correcto según tu modelo, por ejemplo "UsuarioModificacionId" o "UsuarioModificacion"
+                                int? usuarioModId = null;
+                                var propUsuarioMod = contrato.GetType().GetProperty("UsuarioModificacionId");
+                                if (propUsuarioMod != null)
+                                {
+                                    var valUsuarioMod = propUsuarioMod.GetValue(contrato, null);
+                                    if (valUsuarioMod != null && int.TryParse(valUsuarioMod.ToString(), out int id))
+                                    {
+                                        usuarioModId = id;
+                                    }
+                                }
+                                if (usuarioModId.HasValue)
+                                {
+                                    var usuario = usuariosList?.FirstOrDefault(u => u.Idusuarios == usuarioModId.Value);
+                                    if (usuario != null)
+                                    {
+                                        usuarioMod = usuario.Nombre + " " + usuario.Apellido;
+                                    }
+                                }
+                            }
                         }
-                        @(valUsuarioMod != null ? valUsuarioMod.ToString() : "-")
+                        @usuarioMod
                     </td>
                     <td>
                         @{

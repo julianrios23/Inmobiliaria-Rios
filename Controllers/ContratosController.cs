@@ -24,6 +24,8 @@ namespace Inmobiliaria_Rios.Controllers
             var contratos = contexto.Contratos.ToList();
             ViewBag.Clientes = contexto.Clientes.ToList();
             ViewBag.Inmuebles = contexto.Propiedades.ToList();
+            // Agregar la lista de usuarios para mostrar nombre y apellido en la vista
+            ViewBag.Usuarios = contexto.Usuarios.ToList();
             return View(contratos);
         }
 
@@ -42,66 +44,71 @@ namespace Inmobiliaria_Rios.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Contrato contrato)
         {
-            // Log temporal para depuración
-            System.Diagnostics.Debug.WriteLine("POST Contrato:");
-            System.Diagnostics.Debug.WriteLine($"IdInmuebles: {contrato.IdInmuebles}");
-            System.Diagnostics.Debug.WriteLine($"IdClientes: {contrato.IdClientes}");
-            System.Diagnostics.Debug.WriteLine($"FechaInicio: {contrato.FechaInicio}");
-            System.Diagnostics.Debug.WriteLine($"FechaFin: {contrato.FechaFin}");
-            System.Diagnostics.Debug.WriteLine($"MontoMensual: {contrato.MontoMensual}");
-
-            if (!ModelState.IsValid || contrato.IdInmuebles == 0 || contrato.IdClientes == 0)
+            if (ModelState.IsValid)
             {
-                if (contrato.IdInmuebles == 0)
-                    ModelState.AddModelError("IdInmuebles", "Debe seleccionar un inmueble.");
-                if (contrato.IdClientes == 0)
-                    ModelState.AddModelError("IdClientes", "Debe seleccionar un cliente.");
+                // Asigna el ID del usuario logueado (debe existir en la tabla usuarios)
+                // Si tienes el ID en las Claims:
+                // contrato.UsuarioCreacionId = int.Parse(User.FindFirst("Idusuarios").Value);
 
-                ViewBag.Inmuebles = contexto.Propiedades.ToList();
-                ViewBag.Clientes = contexto.Clientes.ToList();
-
-                // Mostrar errores de validación en la vista
-                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                // Si no tienes el ID en las Claims, busca el usuario por nombre:
+                // Evitar posible null en User.Identity
+                string? userName = User?.Identity?.Name;
+                var usuario = contexto.Usuarios.FirstOrDefault(u =>
+                    u.Nombre == userName ||
+                    u.Mail == userName ||
+                    (u.Nombre + " " + u.Apellido) == userName
+                );
+                if (usuario != null)
                 {
-                    System.Diagnostics.Debug.WriteLine("ModelState error: " + error.ErrorMessage);
+                    contrato.UsuarioCreacionId = usuario.Idusuarios;
+                }
+                else
+                {
+                    ModelState.AddModelError("", "No se pudo identificar el usuario actual para asignar como creador del contrato. Verifique que el usuario esté correctamente registrado y que el nombre de usuario coincida con el campo 'Nombre', 'Mail' o 'Nombre Apellido' en la tabla usuarios.");
+                    ViewBag.Inmuebles = contexto.Propiedades.ToList();
+                    ViewBag.Clientes = contexto.Clientes.ToList();
+                    return View("NuevoContrato", contrato);
                 }
 
-                return View("NuevoContrato", contrato);
-            }
-
-            try
-            {
+                contrato.Estado = true;
                 contrato.FechaCreacion = DateTime.Now;
-                contrato.Estado = true; // Booleano, se guarda como 1 en la base de datos
+                // Las fechas de inicio y fin ya vienen del formulario
+                // contrato.FechaInicio y contrato.FechaFin
 
-                // Solución: asignar un valor por defecto a UsuarioCreacionId si existe en el modelo
-                var propUsuarioCreacion = contrato.GetType().GetProperty("UsuarioCreacionId");
-                if (propUsuarioCreacion != null && propUsuarioCreacion.PropertyType == typeof(int))
+                try
                 {
-                    // Puedes poner aquí el ID del usuario actual si tienes autenticación, o un valor fijo temporal
-                    propUsuarioCreacion.SetValue(contrato, 1); // 1 es un ejemplo, usa el valor adecuado
+                    contexto.Contratos.Add(contrato);
+
+                    // Cambiar el estado del inmueble a 0 (inactivo/no disponible)
+                    var inmueble = contexto.Propiedades.FirstOrDefault(p => p.Id == contrato.IdInmuebles);
+                    if (inmueble != null)
+                    {
+                        inmueble.Estado = false;
+                    }
+
+                    contexto.SaveChanges();
+
+                    TempData["Mensaje"] = "Contrato guardado correctamente.";
+                    return RedirectToAction("Index");
                 }
-
-                contexto.Contratos.Add(contrato);
-                contexto.SaveChanges();
-
-                TempData["Mensaje"] = "Contrato guardado correctamente.";
-                return RedirectToAction("Index");
-            }
-            catch (Exception ex)
-            {
-                // Mostrar el error en la vista para depuración
-                ModelState.AddModelError("", "Error al guardar el contrato: " + ex.Message);
-                if (ex.InnerException != null)
+                catch (Exception ex)
                 {
-                    ModelState.AddModelError("", "Detalle: " + ex.InnerException.Message);
-                    System.Diagnostics.Debug.WriteLine("InnerException: " + ex.InnerException.Message);
+                    // Mostrar el error en la vista para depuración
+                    ModelState.AddModelError("", "Error al guardar el contrato: " + ex.Message);
+                    if (ex.InnerException != null)
+                    {
+                        ModelState.AddModelError("", "Detalle: " + ex.InnerException.Message);
+                        System.Diagnostics.Debug.WriteLine("InnerException: " + ex.InnerException.Message);
+                    }
+                    ViewBag.Inmuebles = contexto.Propiedades.ToList();
+                    ViewBag.Clientes = contexto.Clientes.ToList();
+                    System.Diagnostics.Debug.WriteLine("Excepción al guardar: " + ex.Message);
+                    return View("NuevoContrato", contrato);
                 }
-                ViewBag.Inmuebles = contexto.Propiedades.ToList();
-                ViewBag.Clientes = contexto.Clientes.ToList();
-                System.Diagnostics.Debug.WriteLine("Excepción al guardar: " + ex.Message);
-                return View("NuevoContrato", contrato);
             }
+            ViewBag.Inmuebles = contexto.Propiedades.ToList();
+            ViewBag.Clientes = contexto.Clientes.ToList();
+            return View(contrato);
         }
 
         [HttpGet("Edit/{id}")]
@@ -122,7 +129,6 @@ namespace Inmobiliaria_Rios.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Buscar el contrato original en la base de datos
                 var contratoOriginal = contexto.Contratos.FirstOrDefault(c => c.Id == contrato.Id);
                 if (contratoOriginal != null)
                 {
@@ -130,9 +136,33 @@ namespace Inmobiliaria_Rios.Controllers
                     contratoOriginal.IdClientes = contrato.IdClientes;
                     contratoOriginal.FechaInicio = contrato.FechaInicio;
                     contratoOriginal.FechaFin = contrato.FechaFin;
+                    contratoOriginal.FechaFinAnticipada = contrato.FechaFinAnticipada;
                     contratoOriginal.MontoMensual = contrato.MontoMensual;
-                    
+                    contratoOriginal.Multa = contrato.Multa;
                     contratoOriginal.Estado = contrato.Estado;
+
+                    // Guardar el usuario logueado en UsuarioModificacionId (si la propiedad existe)
+                    string? userName = User?.Identity?.Name;
+                    var usuario = contexto.Usuarios.FirstOrDefault(u =>
+                        u.Nombre == userName ||
+                        u.Mail == userName ||
+                        (u.Nombre + " " + u.Apellido) == userName
+                    );
+                    if (usuario != null)
+                    {
+                        var propUsuarioMod = contratoOriginal.GetType().GetProperty("UsuarioModificacionId");
+                        if (propUsuarioMod != null)
+                        {
+                            propUsuarioMod.SetValue(contratoOriginal, usuario.Idusuarios);
+                        }
+                    }
+
+                    // Actualizar la fecha de modificación
+                    var propFechaMod = contratoOriginal.GetType().GetProperty("FechaModificacion");
+                    if (propFechaMod != null)
+                    {
+                        propFechaMod.SetValue(contratoOriginal, DateTime.Now);
+                    }
 
                     contexto.SaveChanges();
                 }
@@ -157,6 +187,19 @@ namespace Inmobiliaria_Rios.Controllers
             ViewBag.Inmuebles = inmuebles;
             ViewBag.Clientes = clientes;
             return View();
+        }
+
+        [HttpGet("EditarContrato/{id}")]
+        public IActionResult EditarContrato(int id)
+        {
+            var contrato = contexto.Contratos.FirstOrDefault(c => c.Id == id);
+            if (contrato == null)
+                return NotFound();
+
+            ViewBag.Inmuebles = contexto.Propiedades.ToList();
+            ViewBag.Clientes = contexto.Clientes.ToList();
+            ViewBag.Usuarios = contexto.Usuarios.ToList();
+            return View("EditarContrato", contrato);
         }
     }
 }
