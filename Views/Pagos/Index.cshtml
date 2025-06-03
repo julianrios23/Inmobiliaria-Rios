@@ -1,33 +1,183 @@
-@model IEnumerable<Inmobiliaria_Rios.Models.Pago>
+@using Inmobiliaria_Rios.Models
+@model IEnumerable<Pago>
+@{
+    ViewData["Title"] = "Pagos";
+    var usuarios = ViewBag.Usuarios as IEnumerable<Inmobiliaria_Rios.Models.Usuario>;
+}
 
-<h1>Pagos</h1>
-<a href="/Pagos/Create?contratoId=@ViewBag.ContratoId">Registrar Pago</a>
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Número de Pago</th>
-            <th>Fecha Pago</th>
-            <th>Importe</th>
-            <th>Concepto</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var pago in Model)
-        {
+<h1 class="display-4-text-primary mb-4 text-center">Pagos</h1>
+<div class="row mb-2 align-items-center">
+    <div class="col-md-3 col-sm-6">
+        
+    </div>
+    <div class="col-md-3 col-sm-6 ms-auto text-end">
+        <a href="/Pagos/Create?contratoId=@ViewBag.ContratoId" class="btn btn-success">
+            <i class="bi bi-plus-circle me-2"></i>Registrar Pago
+        </a>
+    </div>
+</div>
+<div class="table-responsive modern-table-container" style="max-height: 400px; overflow-y: auto;">
+    <table class="table table-hover modern-table">
+        <thead>
             <tr>
-                <td>@pago.Id</td>
-                <td>@pago.NumeroPago</td>
-                <td>@pago.FechaPago.ToShortDateString()</td>
-                <td>@pago.Importe</td>
-                <td>@pago.Concepto</td>
-                <td>@pago.Estado</td>
-                <td>
-                    <a href="/Pagos/Delete/@pago.Id">Eliminar</a>
-                </td>
+                <th>Contrato</th>
+                <th>Número de Pago</th>
+                <th>Fecha Pago</th>
+                <th>Importe</th>
+                <th>Concepto</th>
+                <th>Estado</th>
+                <th>Usuario Creación</th>
+                <th>Fecha Creación</th>
+                <th>Usuario Anulación</th>
+                <th>Fecha Anulación</th>
+                <th>Acciones</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody id="tableBody">
+            @foreach (var pago in Model)
+            {
+                <tr class="align-middle">
+                    <td>@pago.ContratoId</td>
+                    <td>@pago.NumeroPago</td>
+                    <td>@pago.FechaPago.ToShortDateString()</td>
+                    <td>@pago.Importe.ToString("C")</td>
+                    <td>@pago.Concepto</td>
+                    <td>@pago.Estado</td>
+                    <td>
+                        @{
+                            // Mostrar nombre y apellido del usuario de creación si está disponible en ViewBag.Usuarios
+                            string usuarioCreacion = "-";
+                            int? usuarioCreacionId = null;
+                            var propUsuarioCreacion = pago.GetType().GetProperty("UsuarioCreacionId");
+                            if (propUsuarioCreacion != null)
+                            {
+                                var valUsuarioCreacion = propUsuarioCreacion.GetValue(pago, null);
+                                if (valUsuarioCreacion != null && int.TryParse(valUsuarioCreacion.ToString(), out int id))
+                                {
+                                    usuarioCreacionId = id;
+                                }
+                            }
+                            if (ViewBag.Usuarios is IEnumerable<Inmobiliaria_Rios.Models.Usuario> usuariosList && usuarioCreacionId.HasValue)
+                            {
+                                var usuario = usuariosList.FirstOrDefault(u => u.Idusuarios == usuarioCreacionId.Value);
+                                if (usuario != null)
+                                {
+                                    usuarioCreacion = usuario.Nombre + " " + usuario.Apellido;
+                                }
+                            }
+                        }
+                        @usuarioCreacion
+                    </td>
+                    <td>
+                        @(pago.FechaCreacion != DateTime.MinValue ? pago.FechaCreacion.ToString("g") : "-")
+                    </td>
+                    <td>
+                        @{
+                            // Mostrar nombre y apellido del usuario de anulación si está disponible en ViewBag.Usuarios
+                            string usuarioAnulacion = "-";
+                            int? usuarioAnulacionId = null;
+                            var propUsuarioAnulacion = pago.GetType().GetProperty("UsuarioAnulacionId");
+                            if (propUsuarioAnulacion != null)
+                            {
+                                var valUsuarioAnulacion = propUsuarioAnulacion.GetValue(pago, null);
+                                if (valUsuarioAnulacion != null && int.TryParse(valUsuarioAnulacion.ToString(), out int id))
+                                {
+                                    usuarioAnulacionId = id;
+                                }
+                            }
+                            if (ViewBag.Usuarios is IEnumerable<Inmobiliaria_Rios.Models.Usuario> usuariosList2 && usuarioAnulacionId.HasValue)
+                            {
+                                var usuario = usuariosList2.FirstOrDefault(u => u.Idusuarios == usuarioAnulacionId.Value);
+                                if (usuario != null)
+                                {
+                                    usuarioAnulacion = usuario.Nombre + " " + usuario.Apellido;
+                                }
+                            }
+                        }
+                        @usuarioAnulacion
+                    </td>
+                    <td>
+                        @{
+                            var propFechaAnulacion = pago.GetType().GetProperty("FechaAnulacion");
+                            var valFechaAnulacion = propFechaAnulacion?.GetValue(pago, null);
+                        }
+                        @(valFechaAnulacion is DateTime fechaAnulacion && fechaAnulacion != DateTime.MinValue ? fechaAnulacion.ToString("g") : "-")
+                    </td>
+                    <td>
+                        <a href="/Pagos/Delete/@pago.Id" class="btn btn-danger btn-sm">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .display-4-text-primary {
+        font-family: 'Playfair Display', serif;
+        color: #333333;
+        font-size: 3.50rem;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+    .modern-table-container {
+        background: linear-gradient(145deg, #ffffff, #f5f5f5);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 10px 10px 20px rgba(0,0,0,0.05),
+                    -10px -10px 20px rgba(255,255,255,0.8);
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .modern-table-container::-webkit-scrollbar {
+        width: 8px;
+    }
+    .modern-table-container::-webkit-scrollbar-thumb {
+        background-color: #28a745;
+        border-radius: 4px;
+    }
+    .modern-table-container::-webkit-scrollbar-track {
+        background-color: #f1f1f1;
+    }
+    .modern-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        border: none;
+        font-size: 0.85rem;
+    }
+    .modern-table thead th {
+        background: linear-gradient(145deg, #28a745, #20c997);
+        color: white;
+        font-weight: 500;
+        padding: 8px;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        border: none;
+        white-space: nowrap;
+    }
+    .modern-table thead th:first-child { border-top-left-radius: 15px; }
+    .modern-table thead th:last-child { border-top-right-radius: 15px; }
+    .modern-table tbody tr {
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        transition: all 0.3s ease;
+    }
+    .modern-table tbody tr:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .modern-table td {
+        padding: 6px 8px;
+        border: none;
+        border-bottom: 1px solid #e9ecef;
+        white-space: nowrap;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>

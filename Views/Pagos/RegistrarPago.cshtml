@@ -1,0 +1,163 @@
+@model Inmobiliaria_Rios.Models.Pago
+
+@{
+    ViewData["Title"] = "Registrar Pago";
+    var contratos = ViewBag.Contratos as IEnumerable<Inmobiliaria_Rios.Models.Contrato> ?? Enumerable.Empty<Inmobiliaria_Rios.Models.Contrato>();
+    var clientes = ViewBag.Clientes as IEnumerable<Inmobiliaria_Rios.Models.Cliente> ?? Enumerable.Empty<Inmobiliaria_Rios.Models.Cliente>();
+}
+
+<h1 class="display-4-text-primary mb-4 text-center">Registrar Pago</h1>
+<form asp-action="RegistrarPago" asp-controller="Pagos" method="post" class="row g-3" autocomplete="off" id="formRegistrarPago">
+    <input type="hidden" asp-for="Id" />
+    <div class="col-md-6">
+        <label class="form-label">Buscar Contrato (por cliente)</label>
+        <div class="input-group">
+            <input type="text" id="searchContrato" class="form-control" placeholder="Buscar cliente..." autocomplete="off" required>
+            <button class="btn btn-success" type="button" id="limpiarBusquedaContrato">
+                <i class="bi bi-x-circle"></i>
+            </button>
+        </div>
+        <input type="hidden" asp-for="ContratoId" id="ContratoId" />
+        <span class="text-danger" id="contratoError"></span>
+        <div id="searchResultsContrato" class="list-group position-absolute" style="z-index: 1000; width: 95%;"></div>
+        <div id="contratoInfo" class="mt-2"></div>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="NumeroPago" class="form-label">Número de Pago</label>
+        <input asp-for="NumeroPago" type="number" class="form-control" required min="1" />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="FechaPago" class="form-label">Fecha de Pago</label>
+        <input asp-for="FechaPago" type="date" class="form-control" required />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Importe" class="form-label">Importe</label>
+        <input asp-for="Importe" type="number" step="0.01" class="form-control" required />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Concepto" class="form-label">Concepto</label>
+        <input asp-for="Concepto" type="text" class="form-control" maxlength="100" required />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Estado" class="form-label">Estado</label>
+        <input asp-for="Estado" type="text" class="form-control" maxlength="20" required />
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">Usuario Creación</label>
+        <input type="text" class="form-control" value="@User.Identity?.Name" readonly />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="FechaCreacion" class="form-label">Fecha Creación</label>
+        <input asp-for="FechaCreacion" type="text" class="form-control" value="@DateTime.Now.ToString("g")" readonly />
+    </div>
+    @* Los campos UsuarioAnulacionId y FechaAnulacion no se muestran ni editan en el alta *@
+    <div class="col-12 text-center mt-4">
+        <button type="submit" class="btn btn-success me-2" id="guardarBtn" disabled>
+            <i class="bi bi-save"></i> Guardar
+        </button>
+        <a href="@Url.Action("Index", "Pagos")" class="btn btn-secondary">
+            <i class="bi bi-x-circle"></i> Cancelar
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        // --- CONTRATO (busca por cliente) ---
+        const searchContrato = document.getElementById('searchContrato');
+        const searchResultsContrato = document.getElementById('searchResultsContrato');
+        const contratoIdInput = document.getElementById('ContratoId');
+        const contratoInfo = document.getElementById('contratoInfo');
+        const contratos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            contratos.Where(c => c.Estado == true).ToList()
+        ));
+        const clientes = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(clientes ?? new List<Inmobiliaria_Rios.Models.Cliente>()));
+
+        searchContrato.addEventListener('input', function () {
+            const searchTerm = this.value.trim().toLowerCase();
+            if (searchTerm.length < 2) {
+                searchResultsContrato.innerHTML = '';
+                return;
+            }
+            const filtered = contratos
+                .map(c => {
+                    const cliente = clientes.find(cl => cl.Id === c.IdClientes);
+                    return {
+                        contrato: c,
+                        cliente: cliente
+                    };
+                })
+                .filter(x =>
+                    x.cliente &&
+                    (x.cliente.Nombre && x.cliente.Nombre.toLowerCase().includes(searchTerm) ||
+                    x.cliente.Apellido && x.cliente.Apellido.toLowerCase().includes(searchTerm))
+                );
+            if (filtered.length > 0) {
+                searchResultsContrato.innerHTML = filtered.map(x => `
+                    <a href="#" class="list-group-item list-group-item-action"
+                       onclick="seleccionarContrato(${x.contrato.Id}, '${x.cliente.Nombre}', '${x.cliente.Apellido}', '${x.contrato.FechaInicio}', '${x.contrato.FechaFin}'); return false;">
+                        Contrato #${x.contrato.Id} - ${x.cliente.Nombre} ${x.cliente.Apellido} (${x.contrato.FechaInicio.split('T')[0]} / ${x.contrato.FechaFin.split('T')[0]})
+                    </a>
+                `).join('');
+            } else {
+                searchResultsContrato.innerHTML = '<div class="list-group-item text-danger">No se encontraron resultados</div>';
+            }
+        });
+
+        function seleccionarContrato(id, nombre, apellido, fechaInicio, fechaFin) {
+            contratoIdInput.value = id;
+            searchContrato.value = `Contrato #${id} - ${nombre} ${apellido} (${fechaInicio.split('T')[0]} / ${fechaFin.split('T')[0]})`;
+            contratoInfo.innerHTML = `
+                <div class="alert alert-success">
+                    <strong>Contrato seleccionado:</strong><br>
+                    ${nombre} ${apellido}<br>
+                    Vigencia: ${fechaInicio.split('T')[0]} / ${fechaFin.split('T')[0]}
+                </div>`;
+            searchResultsContrato.innerHTML = '';
+        }
+
+        document.getElementById('limpiarBusquedaContrato').addEventListener('click', function () {
+            searchContrato.value = '';
+            contratoIdInput.value = '';
+            contratoInfo.innerHTML = '';
+            searchResultsContrato.innerHTML = '';
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!searchContrato.contains(e.target) && !searchResultsContrato.contains(e.target)) {
+                searchResultsContrato.innerHTML = '';
+            }
+        });
+
+        // Validación para habilitar el botón Guardar solo si todos los campos requeridos están completos
+        document.addEventListener('DOMContentLoaded', function () {
+            const guardarBtn = document.getElementById('guardarBtn');
+            const form = document.getElementById('formRegistrarPago');
+            const requiredInputs = [
+                document.getElementById('ContratoId'),
+                document.getElementById('NumeroPago'),
+                document.getElementById('FechaPago'),
+                document.getElementById('Importe'),
+                document.getElementById('Concepto'),
+                document.getElementById('Estado')
+            ];
+
+            function validateForm() {
+                let allFilled = true;
+                requiredInputs.forEach(input => {
+                    if (!input.value || input.value.trim() === '' || input.value === '0') {
+                        allFilled = false;
+                    }
+                });
+                guardarBtn.disabled = !allFilled;
+            }
+
+            requiredInputs.forEach(input => {
+                input.addEventListener('input', validateForm);
+                input.addEventListener('change', validateForm);
+            });
+
+            validateForm(); // Validar al cargar la página
+        });
+    </script>
+}

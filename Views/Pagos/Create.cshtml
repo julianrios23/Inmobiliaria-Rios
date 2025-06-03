@@ -1,0 +1,69 @@
+@model Inmobiliaria_Rios.Models.Pago
+
+@{
+    ViewData["Title"] = "Registrar Pago";
+    var contratos = ViewBag.Contratos as IEnumerable<Inmobiliaria_Rios.Models.Contrato> ?? Enumerable.Empty<Inmobiliaria_Rios.Models.Contrato>();
+}
+
+<h1 class="display-4-text-primary mb-4 text-center">Registrar Pago</h1>
+<form asp-action="RegistrarPago" asp-controller="Pagos" method="post" class="row g-3" autocomplete="off">
+    <input type="hidden" asp-for="Id" />
+    <div class="col-md-6">
+        <label asp-for="ContratoId" class="form-label">Contrato</label>
+        <select asp-for="ContratoId" class="form-select" required>
+            <option value="">Seleccione un contrato...</option>
+            @foreach (var c in contratos)
+            {
+                if (Model.ContratoId == c.Id)
+                {
+                    <option value="@c.Id" selected>
+                        @($"Contrato #{c.Id} - {c.FechaInicio.ToShortDateString()} / {c.FechaFin.ToShortDateString()}")
+                    </option>
+                }
+                else
+                {
+                    <option value="@c.Id">
+                        @($"Contrato #{c.Id} - {c.FechaInicio.ToShortDateString()} / {c.FechaFin.ToShortDateString()}")
+                    </option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="NumeroPago" class="form-label">Número de Pago</label>
+        <input asp-for="NumeroPago" type="number" class="form-control" required min="1" />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="FechaPago" class="form-label">Fecha de Pago</label>
+        <input asp-for="FechaPago" type="date" class="form-control" required />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Importe" class="form-label">Importe</label>
+        <input asp-for="Importe" type="number" step="0.01" class="form-control" required />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Concepto" class="form-label">Concepto</label>
+        <input asp-for="Concepto" type="text" class="form-control" maxlength="100" required />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Estado" class="form-label">Estado</label>
+        <input asp-for="Estado" type="text" class="form-control" maxlength="20" required />
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">Usuario Creación</label>
+        <input type="text" class="form-control" value="@User.Identity?.Name" readonly />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="FechaCreacion" class="form-label">Fecha Creación</label>
+        <input asp-for="FechaCreacion" type="text" class="form-control" value="@DateTime.Now.ToString("g")" readonly />
+    </div>
+    @* Los campos UsuarioAnulacionId y FechaAnulacion no se muestran ni editan en el alta *@
+    <div class="col-12 text-center mt-4">
+        <button type="submit" class="btn btn-success me-2">
+            <i class="bi bi-save"></i> Guardar
+        </button>
+        <a href="@Url.Action("Index", "Pagos")" class="btn btn-secondary">
+            <i class="bi bi-x-circle"></i> Cancelar
+        </a>
+    </div>
+</form>
