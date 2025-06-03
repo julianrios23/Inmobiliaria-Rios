@@ -141,8 +141,21 @@ namespace Inmobiliaria_Rios.Controllers
                     contratoOriginal.Multa = contrato.Multa;
                     contratoOriginal.Estado = contrato.Estado;
 
-                    // Guardar el usuario logueado en UsuarioModificacionId (si la propiedad existe)
-                    string? userName = User?.Identity?.Name;
+                    // Validar si la fecha actual es mayor a la fecha de finalización
+                    if (DateTime.Now.Date > contratoOriginal.FechaFin.Date)
+                    {
+                        contratoOriginal.Estado = false; // Inactivo
+
+                        // Cambiar el estado del inmueble a disponible (true)
+                        var inmueble = contexto.Propiedades.FirstOrDefault(p => p.Id == contratoOriginal.IdInmuebles);
+                        if (inmueble != null)
+                        {
+                            inmueble.Estado = true;
+                        }
+                    }
+
+                    // Guardar el id del usuario logueado en UsuarioModificacionId
+                    var userName = User?.Identity?.Name ?? "";
                     var usuario = contexto.Usuarios.FirstOrDefault(u =>
                         u.Nombre == userName ||
                         u.Mail == userName ||
@@ -150,19 +163,11 @@ namespace Inmobiliaria_Rios.Controllers
                     );
                     if (usuario != null)
                     {
-                        var propUsuarioMod = contratoOriginal.GetType().GetProperty("UsuarioModificacionId");
-                        if (propUsuarioMod != null)
-                        {
-                            propUsuarioMod.SetValue(contratoOriginal, usuario.Idusuarios);
-                        }
+                        contratoOriginal.UsuarioModificacionId = usuario.Idusuarios;
                     }
 
-                    // Actualizar la fecha de modificación
-                    var propFechaMod = contratoOriginal.GetType().GetProperty("FechaModificacion");
-                    if (propFechaMod != null)
-                    {
-                        propFechaMod.SetValue(contratoOriginal, DateTime.Now);
-                    }
+                    // Guardar la fecha de modificación
+                    contratoOriginal.FechaModificacion = DateTime.Now;
 
                     contexto.SaveChanges();
                 }

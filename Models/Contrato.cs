@@ -18,7 +18,8 @@ namespace Inmobiliaria_Rios.Models
         public decimal? Multa { get; set; }
         public bool Estado { get; set; }
         public DateTime FechaCreacion { get; set; }
-        public DateTime? FechaModificacion { get; set; }
         public int UsuarioCreacionId { get; set; }
+        public int? UsuarioModificacionId { get; set; }
+        public DateTime? FechaModificacion { get; set; }
     }
 }
